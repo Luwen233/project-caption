@@ -1,295 +1,269 @@
 <template>
-  <div>
+  <div class="budget-form-container">
+    <input type="file" ref="fileInput" style="display: none" @change="onFilePicked" />
 
-    <div
-      v-for="(cat, ci) in categories"
-      :key="ci"
-      class="budget-section"
-    >
-      <h5 class="section-title">{{ cat.title }}</h5>
+    <div v-for="(cat, ci) in categories" :key="ci" class="mb-5">
+      <div class="mb-3 pb-3 border-bottom">
+        <h5 class="font-weight-bold text-primary mb-3">
+          <CIcon name="cil-money" class="mr-2"/> {{ cat.title }}
+        </h5>
 
-      <div class="toolbar">
+        <div class="d-flex flex-wrap align-items-center" style="gap: 12px;">
+          <div v-if="cat.options.length > 0" style="min-width: 350px;">
+            <CSelect 
+              :options="['', ...cat.options]" 
+              :value.sync="cat.selected" 
+              @change="addRow(ci)" 
+              placeholder="-- เลือกรายการย่อย --" 
+              custom 
+              class="mb-0 shadow-sm" 
+            />
+          </div>
+          <CButton color="info" variant="outline" size="sm" @click="addManualRow(ci)">
+            <CIcon name="cil-plus" class="mr-1"/> เพิ่มรายการเอง
+          </CButton>
+          <CButton color="dark" variant="outline" size="sm" @click="triggerFileUpload(ci)">
+            <CIcon name="cil-paperclip" class="mr-1"/> แนบเอกสาร
+          </CButton>
+        </div>
+      </div>
 
-  <!-- dropdown mode -->
-  <select
-    v-if="!cat.manual"
-    v-model="cat.selected"
-    @change="addRow(ci)"
-  >
-    <option value="">เพิ่มรายการ</option>
-    <option v-for="o in cat.options" :key="o">{{ o }}</option>
-  </select>
+      <div class="table-responsive bg-white rounded shadow-sm border">
+        <table class="table table-bordered table-striped mb-0 align-middle">
+          <thead class="bg-light text-center small font-weight-bold text-muted text-uppercase">
+            <tr>
+              <th style="width: 25%">รายการ</th>
+              <th style="width: 25%">รายละเอียดตัวคูณ (เกณฑ์ มฟล. 2569)</th>
+              <th style="width: 12%">งบรวม (บาท)</th>
+              <th style="width: 10%">งวด 1</th>
+              <th style="width: 10%">งวด 2</th>
+              <th style="width: 10%">งวด 3</th>
+              <th style="width: 40px">#</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-if="cat.rows.length === 0">
+              <td colspan="7" class="text-center py-4 text-muted small">ยังไม่มีข้อมูลในหมวดนี้</td>
+            </tr>
+            <tr v-for="(r, ri) in cat.rows" :key="ri">
+              <td class="px-3">
+                <div v-if="!r.isManual && !r.fileName" class="font-weight-bold text-dark small py-1 px-2">
+                  {{ r.name }}
+                </div>
+                <CInput v-else v-model="r.name" size="sm" class="mb-0" placeholder="ชื่อรายการ..." />
+                <small v-if="r.fileName" class="text-success d-block mt-1">
+                  <CIcon name="cil-file" size="sm"/> {{ r.fileName }}
+                </small>
+              </td>
 
-  <!-- manual mode -->
-  <button
-    v-else
-    class="btn-blue"
-    @click="addManualRow(ci)"
-  >
-    + เพิ่มรายการ
-  </button>
+              <td>
+                <div v-if="r.multipliers" class="d-flex align-items-center justify-content-center" style="gap: 5px;">
+                  <div v-for="(m, mi) in r.multipliers" :key="mi" class="text-center">
+                    <CInput 
+                      type="number" 
+                      v-model.number="m.val" 
+                      size="sm" 
+                      class="mb-0 text-center" 
+                      style="width: 65px;" 
+                      @input="calculateRowTotal(r)" 
+                    />
+                    <small class="text-muted d-block" style="font-size: 10px">{{ m.label }}</small>
+                  </div>
+                </div>
+                <CInput v-else v-model="r.detail" size="sm" class="mb-0" placeholder="รายละเอียด..." />
+              </td>
 
-  <button class="btn-blue">แนบเอกสาร</button>
+              <td>
+                <div class="text-right font-weight-bold text-primary py-1 px-2 border rounded bg-light small">
+                  {{ Number(r.total || 0).toLocaleString() }}
+                </div>
+              </td>
 
-</div>
-
-
-      <table class="budget-table">
-        <thead>
-          <tr>
-            <th>รายการ</th>
-            <th>รายละเอียดตัวคูณ</th>
-            <th>งบรวม</th>
-            <th>งวด 1</th>
-            <th>งวด 2</th>
-            <th>งวด 3</th>
-            <th></th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <tr v-for="(r, ri) in cat.rows" :key="ri">
-            <td>
-
-  <!-- dropdown category = readonly -->
-  <div v-if="!cat.manual" class="item-label">
-    {{ r.name }}
-  </div>
-
-  <!-- manual category = editable -->
-  <input
-    v-else
-    v-model="r.name"
-    placeholder="ชื่อรายการ"
-  />
-
-</td>
-
-            <td><input v-model="r.detail" /></td>
-            <td><input type="number" v-model.number="r.total" /></td>
-            <td><input type="number" v-model.number="r.p1" /></td>
-            <td><input type="number" v-model.number="r.p2" /></td>
-            <td><input type="number" v-model.number="r.p3" /></td>
-            <td>
-              <button class="btn-del" @click="removeRow(ci, ri)">ลบ</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
+              <td v-for="p in ['p1', 'p2', 'p3']" :key="p">
+                <CInput 
+                  type="number" 
+                  v-model.number="r[p]" 
+                  size="sm" 
+                  :class="['mb-0 text-right', r.errors[p] ? 'is-invalid-bg text-danger border-danger' : '']" 
+                  @input="validateInstallments(r, p)" 
+                />
+                <small v-if="r.errors[p]" class="text-danger d-block mt-1 font-weight-bold text-center" style="font-size: 9px;">
+                  {{ r.errors[p] }}
+                </small>
+              </td>
+              
+              <td class="text-center">
+                <CButton color="danger" variant="ghost" size="sm" @click="removeRow(ci, ri)">
+                  <CIcon name="cil-trash"/>
+                </CButton>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
-    <div class="grand-total">
-      รวมงบประมาณที่เสนอขอรวม
-      <input :value="grandTotal" readonly />
-      <button class="btn-red">ล้างฟอร์ม</button>
-      <button class="btn-blue">บันทึกแบบร่าง</button>
-    </div>
-
+    <CCard class="mt-5 border-primary shadow bg-light">
+      <CCardBody class="p-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap" style="gap: 20px;">
+          <div>
+            <h4 class="m-0 font-weight-bold text-dark">สรุปงบประมาณรวมทั้งสิ้น (พ.ศ. 2569)</h4>
+            <div class="h3 m-0 text-primary font-weight-bold mt-1">
+              {{ grandTotal.toLocaleString() }} <small class="text-muted" style="font-size: 14px">บาท</small>
+            </div>
+          </div>
+          
+          <div class="d-flex" style="gap: 12px;">
+            <CButton color="danger" variant="outline" class="px-4 py-2" @click="resetForm">
+              <CIcon name="cil-ban" class="mr-1"/> ล้างฟอร์มทั้งหมด
+            </CButton>
+            <CButton color="primary" class="px-5 py-2 font-weight-bold shadow-sm" @click="saveDraft">
+              <CIcon name="cil-save" class="mr-1"/> บันทึกแบบร่าง
+            </CButton>
+          </div>
+        </div>
+      </CCardBody>
+    </CCard>
   </div>
 </template>
 
 <script>
 export default {
-  name: "BudgetForm",
-
+  name: "BudgetSection",
   data() {
-  return {
-    categories: [
-      this.makeCat("หมวดค่าตอบแทน", [
-        "ค่าตอบแทน – นักศึกษาช่วยงานด้านวิชาการ",
-        "ค่าตอบแทน – นักศึกษาช่วยงานทั่วไป",
-        "ค่าตอบแทน – ผู้ให้ข้อมูล",
-        "ค่าตอบแทน – ผู้ให้สัมภาษณ์",
-        "ค่าตอบแทน – ผู้ตอบแบบสอบถาม",
-        "ค่าตอบแทน – อาสาสมัคร",
-      ]),
-
-      this.makeCat("หมวดค่าใช้สอย", [
-        "ค่าใช้จ่ายในการจัดประชุม - ค่าอาหารกลางวัน",
-        "ค่าใช้จ่ายในการจัดประชุม - ค่าอาหารว่าง",
-        "ค่าธรรมเนียมการขอจริยธรรมการวิจัยในมนุษย์",
-        "ค่าจ้างเหมาวิเคราะห์ทดสอบทางวิทยาศาสตร์",
-        "ค่าจ้างเหมาวิเคราะห์ทางการแพทย์",
-        "ค่าจ้างเหมาผู้ช่วยเก็บข้อมูลในพื้นที่",
-        "ค่าจ้างเหมาผู้นำทางในพื้นที่ (ล่าม)",
-        "ค่าจ้างเหมาถอดเทป",
-        "ค่าจ้างเหมาอื่นๆ - ระบุ",
-        "ค่าธรรมเนียมการใช้ห้องปฏิบัติการ",
-        "ค่าธรรมเนียมเครื่องมือวิเคราะห์ทดสอบ",
-        "ค่าธรรมเนียมอื่น - ระบุ",
-        "ค่าถ่ายเอกสาร",
-        "ค่าจัดทำรูปเล่มรายงานวิจัย",
-        "ค่าไปรษณีย์และขนส่ง",
-        "ค่าโทรศัพท์และโทรสารในประเทศ",
-        "ค่าบริการทางอินเตอร์เน็ต",
-      ]),
-
-      this.makeCat("หมวดค่าเดินทาง", [
-        "ค่ายานพาหนะเครื่องบินอาจารย์",
-        "ค่าพาหนะ (รถยนต์ส่วนบุคคล)",
-        "ค่าเช่ายานพาหนะรถตู้",
-        "ค่าพาหนะ (Taxi)",
-        "ค่าที่พัก",
-        "ค่าเบี้ยเลี้ยง",
-      ]),
-
-      this.makeCat("หมวดค่าวัสดุ", [
-        "ค่าวัสดุสำนักงาน",
-        "ค่าวัสดุคอมพิวเตอร์",
-        "ค่าวัสดุวิทยาศาสตร์",
-        "ค่าวัสดุโปรแกรม/ลิขสิทธิ์",
-        "ค่าวัสดุไฟฟ้าและวิทยุ",
-        "ค่าวัสดุงานบ้านงานครัว",
-        "ค่าวัสดุก่อสร้างและประปา",
-        "ค่าวัสดุเชื้อเพลิง",
-        "ค่าวัสดุการเกษตร",
-        "ค่าวัสดุโฆษณา",
-        "ค่าวัสดุเครื่องแต่งกาย",
-        "ค่าวัสดุกีฬา",
-        "ค่าวัสดุสื่อ/ตำรา",
-        "ค่าเวชภัณฑ์ยา",
-        "ค่าเวชภัณฑ์ที่มิใช่ยา",
-        "ค่าบรรจุภัณฑ์",
-        "ค่าวัสดุของที่ระลึก",
-      ]),
-
-      this.makeCat("หมวดค่าสาธารณูปโภค", [], true),
-      this.makeCat("หมวดครุภัณฑ์", [], true),
-    ],
-  }
-},
-
-
+    return {
+      activeCategoryIndex: null,
+      categories: [
+        this.makeCat("หมวดค่าตอบแทน", [
+          "ค่าตอบแทน – นักศึกษาช่วยงานด้านวิชาการ",
+          "ค่าตอบแทน – นักศึกษาช่วยงานทั่วไป",
+          "ค่าตอบแทน – ผู้ให้ข้อมูล",
+          "ค่าตอบแทน – ผู้ให้สัมภาษณ์",
+          "ค่าตอบแทน – ผู้ตอบแบบสอบถาม",
+          "ค่าตอบแทน – อาสาสมัคร"
+        ]),
+        this.makeCat("หมวดค่าใช้สอย", [
+          "ค่าใช้จ่ายในการจัดประชุม - ค่าอาหารกลางวัน (แนบกำหนดการ)",
+          "ค่าใช้จ่ายในการจัดประชุม - ค่าอาหารว่าง (แนบกำหนดการ)",
+          "ค่าธรรมเนียมการขอจริยธรรมการวิจัยในมนุษย์",
+          "ค่าจ้างเหมาวิเคราะห์ทดสอบทางวิทยาศาสตร์ (แนบ TOR)",
+          "ค่าจ้างเหมาวิเคราะห์ทางการแพทย์ (แนบ TOR)",
+          "ค่าจ้างเหมาผู้ช่วยเก็บข้อมูลในพื้นที่ (แนบ TOR)",
+          "ค่าจ้างเหมาผู้นำทางในพื้นที่ (ล่าม) (แนบ TOR)",
+          "ค่าจ้างเหมาถอดเทป (แนบ TOR)",
+          "ค่าจ้างเหมาอื่นๆ - ระบุ (แนบ TOR)",
+          "ค่าธรรมเนียมการใช้ห้องปฏิบัติการ (แนบอัตราค่าบริการหรือใบเสนอราคา)",
+          "ค่าถ่ายเอกสาร",
+          "ค่าไปรษณีย์และขนส่ง",
+          "ค่าบริการทางอินเตอร์เน็ต"
+        ]),
+        this.makeCat("หมวดค่าเดินทาง", [
+          "ค่ายานพาหนะเครื่องบินอาจารย์",
+          "ค่าพาหนะในการเดินทางไปปฏิบัติงาน (รถยนต์ส่วนบุคคล)",
+          "ค่าเช่ายานพาหนะรถตู้ (แนบ TOR)",
+          "ค่าที่พัก",
+          "ค่าเบี้ยเลี้ยง (กรณีเดินทางออกนอกพื้นที่จังหวัด)"
+        ]),
+        this.makeCat("หมวดค่าวัสดุ", [
+          "ค่าวัสดุสำนักงาน",
+          "ค่าวัสดุคอมพิวเตอร์",
+          "ค่าวัสดุวิทยาศาสตร์",
+          "น้ำมันเชื้อเพลิงพาหนะเช่า",
+          "ค่าเวชภัณฑ์ยา"
+        ]),
+        this.makeCat("หมวดค่าสาธารณูปโภค", []),
+        this.makeCat("หมวดครุภัณฑ์", [])
+      ]
+    };
+  },
   computed: {
     grandTotal() {
       return this.categories.reduce((sum, c) => {
-        return sum + c.rows.reduce((s, r) => s + Number(r.total || 0), 0)
-      }, 0)
+        const catSum = c.rows.reduce((s, r) => s + Number(r.total || 0), 0);
+        return sum + catSum;
+      }, 0);
     }
   },
-
   methods: {
-    makeCat(title, options = [], manual = false) {
-  return {
-    title,
-    options,
-    manual,
-    selected: "",
-    rows: []
-  }
-},
-
-
+    makeCat(title, options = []) {
+      return { title, options, selected: "", rows: [] };
+    },
     addRow(ci) {
-      const cat = this.categories[ci]
-      if (!cat.selected) return
-
-      cat.rows.push({
-        name: cat.selected,
-        detail: "",
-        total: 0,
-        p1: 0,
-        p2: 0,
-        p3: 0
-      })
-
-      cat.selected = ""
+      const cat = this.categories[ci];
+      if (!cat.selected) return;
+      cat.rows.push(this.newRow(cat.selected, false, null, cat.title));
+      cat.selected = "";
     },
     addManualRow(ci) {
-  this.categories[ci].rows.push({
-    name: "",
-    detail: "",
-    total: 0,
-    p1: 0,
-    p2: 0,
-    p3: 0
-  })
-},
+      const cat = this.categories[ci];
+      cat.rows.push(this.newRow("", true, null, cat.title));
+    },
+    newRow(name, isManual, fileName = null, catTitle = "") {
+      let multipliers = null;
+      // อัตรา มฟล. 2569
+      if (name.includes("วิชาการ")) {
+        multipliers = [{ label: "ชม.", val: 0 }, { label: "คน", val: 0 }, { label: "บาท", val: 60 }];
+      } else if (name.includes("ทั่วไป")) {
+        multipliers = [{ label: "ชม.", val: 0 }, { label: "คน", val: 0 }, { label: "บาท", val: 30 }];
+      } else if (name.includes("อาหารกลางวัน")) {
+        multipliers = [{ label: "มื้อ", val: 0 }, { label: "คน", val: 0 }, { label: "บาท", val: 120 }];
+      } else if (name.includes("เบี้ยเลี้ยง")) {
+        multipliers = [{ label: "วัน", val: 0 }, { label: "คน", val: 0 }, { label: "บาท", val: 350 }];
+      } else if (name.includes("รถยนต์ส่วนบุคคล")) {
+        multipliers = [{ label: "กม.", val: 0 }, { label: "รอบ", val: 2 }, { label: "บาท", val: 4 }];
+      } else if (catTitle === "หมวดค่าวัสดุ") {
+        multipliers = [{ label: "หน่วย", val: 0 }, { label: "บาท", val: 0 }];
+      }
 
-
+      return { 
+        name, detail: "", p1: 0, p2: 0, p3: 0, total: 0, 
+        isManual, fileName, multipliers, errors: { p1: "", p2: "", p3: "" } 
+      };
+    },
+    calculateRowTotal(row) {
+      if (row.multipliers) {
+        row.total = row.multipliers.reduce((acc, m) => acc * (Number(m.val) || 0), 1);
+        row.p1 = 0; row.p2 = 0; row.p3 = 0;
+      }
+    },
+    validateInstallments(row, field) {
+      const sum = Number(row.p1 || 0) + Number(row.p2 || 0) + Number(row.p3 || 0);
+      if (sum > row.total) {
+        row.errors[field] = `เกินงบรวม!`;
+        row[field] = 0;
+      } else {
+        row.errors.p1 = ""; row.errors.p2 = ""; row.errors.p3 = "";
+      }
+    },
+    triggerFileUpload(ci) {
+      this.activeCategoryIndex = ci;
+      this.$refs.fileInput.click();
+    },
+    onFilePicked(event) {
+      const file = event.target.files[0];
+      if (file && this.activeCategoryIndex !== null) {
+        const cat = this.categories[this.activeCategoryIndex];
+        cat.rows.push(this.newRow("", true, file.name, cat.title));
+      }
+      event.target.value = "";
+    },
     removeRow(ci, ri) {
-      this.categories[ci].rows.splice(ri, 1)
+      this.categories[ci].rows.splice(ri, 1);
+    },
+    resetForm() {
+      this.categories.forEach(c => { c.rows = []; });
+    },
+    saveDraft() {
+      alert("บันทึกเรียบร้อย");
     }
   }
-}
+};
 </script>
 
 <style scoped>
-.item-label {
-  padding: 6px 8px;
-  background: #f3f4f6;
-  border-radius: 4px;
-  font-size: 13px;
-}
-
-.budget-section {
-  border-top: 1px solid #ddd;
-  padding: 15px 0;
-}
-
-.section-title {
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-.toolbar {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-.budget-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.budget-table th,
-.budget-table td {
-  border: 1px solid #ddd;
-  padding: 6px;
-}
-
-.budget-table input {
-  width: 100%;
-  padding: 4px;
-}
-
-.btn-blue {
-  background: #2f6fed;
-  color: white;
-  border: none;
-  padding: 6px 10px;
-  cursor: pointer;
-}
-
-.btn-red {
-  background: #e74c3c;
-  color: white;
-  border: none;
-  padding: 6px 10px;
-  cursor: pointer;
-}
-
-.btn-del {
-  background: #ff5a5a;
-  color: white;
-  border: none;
-  padding: 4px 8px;
-  cursor: pointer;
-}
-
-.grand-total {
-  margin-top: 20px;
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.grand-total input {
-  width: 120px;
-  padding: 6px;
-}
-
+.table td .form-control { border: 1px solid #d8dbe0; }
+.table td .form-control:focus { border-color: #321fdb; box-shadow: none; }
+.is-invalid-bg { background-color: #fff5f5 !important; transition: all 0.3s ease; }
+.bg-light { background-color: #f8f9fa !important; }
+.border-primary { border-color: #321fdb !important; }
 </style>
