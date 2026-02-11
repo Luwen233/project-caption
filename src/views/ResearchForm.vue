@@ -145,15 +145,96 @@
                 <BudgetSection v-model="form.budgets" />
               </CCardBody>
             </CCard>
-            <CRow class="mt-4">
+
+
+            <CRow class="mb-5">
               <CCol md="12">
-                <label class="font-weight-bold">18) มาตรฐานการวิจัย</label>
-                <div>
-                  <CInputCheckbox label="การวิจัยในมนุษย์" :checked.sync="form.ethics.human" custom inline />
-                  <CInputCheckbox label="การวิจัยสัตว์ทดลอง" :checked.sync="form.ethics.animal" custom inline />
+                <h5 class="font-weight-bold mb-4">18) มาตรฐานการวิจัย <span class="text-danger">*</span></h5>
+
+                <div class="standard-container p-3 border rounded bg-white shadow-sm">
+
+                  <div class="custom-control custom-checkbox mb-3">
+                    <input type="checkbox" class="custom-control-input" id="std_none" value="none"
+                      v-model="form.standards">
+                    <label class="custom-control-label" for="std_none">
+                      ไม่มีการทำวิจัยในมนุษย์ / ไม่มีการใช้สัตว์ทดลอง /
+                      การวิจัยที่เกี่ยวข้องกับการงานด้านเทคโนโลยีชีวภาพสมัยใหม่
+                    </label>
+                  </div>
+
+                  <div class="custom-control custom-checkbox mb-2">
+                    <input type="checkbox" class="custom-control-input" id="std_human" value="human"
+                      v-model="form.standards">
+                    <label class="custom-control-label" for="std_human">มีการทำวิจัยในมนุษย์</label>
+                  </div>
+
+                  <div v-if="form.standards.includes('human')" class="ml-5 mb-4 p-2 border-left">
+                    <div class="custom-control custom-checkbox mb-2">
+                      <input type="checkbox" class="custom-control-input" id="human_cert"
+                        v-model="form.humanDetail.hasCert">
+                      <label class="custom-control-label small" for="human_cert">มีหนังสือรับรองจริยธรรมการวิจัยในมนุษย์
+                        (แนบสำเนา 1 ชุด)</label>
+                    </div>
+
+                    <div class="custom-control custom-checkbox mb-2">
+                      <input type="checkbox" class="custom-control-input" id="human_pending"
+                        v-model="form.humanDetail.isPending">
+                      <label class="custom-control-label small" for="human_pending">
+                        ไม่มีหนังสือรับรองจริยธรรมการวิจัยในมนุษย์
+                        อยู่ระหว่างเสนอคณะกรรมการจริยธรรมการวิจัยในมนุษย์พิจารณา
+                      </label>
+                    </div>
+
+                    <div v-if="form.humanDetail.isPending" class="d-flex align-items-center mt-2 ml-4 flex-wrap"
+                      style="gap: 10px;">
+                      <span class="small">วันที่ยื่นโครงการ</span>
+                      <CInput type="date" v-model="form.humanDetail.applyDate" size="sm" class="mb-0"
+                        style="width: 150px;" />
+                      <div class="custom-file-upload border p-1 rounded bg-light d-flex align-items-center">
+                        <input type="file" @change="handleFileUpload($event, 'human')" class="small">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="custom-control custom-checkbox mb-2">
+                    <input type="checkbox" class="custom-control-input" id="std_animal" value="animal"
+                      v-model="form.standards">
+                    <label class="custom-control-label" for="std_animal">มีการใช้สัตว์ทดลอง</label>
+                  </div>
+
+                  <div v-if="form.standards.includes('animal')" class="ml-5 p-2 border-left">
+                    <div class="custom-control custom-checkbox mb-2">
+                      <input type="checkbox" class="custom-control-input" id="animal_cert"
+                        v-model="form.animalDetail.hasCert">
+                      <label class="custom-control-label small"
+                        for="animal_cert">มีหนังสือรับรองจรรยาบรรณสัตว์เพื่องานทางวิทยาศาสตร์ (แนบสำเนา 1 ชุด)</label>
+                    </div>
+
+                    <div class="custom-control custom-checkbox mb-2">
+                      <input type="checkbox" class="custom-control-input" id="animal_pending"
+                        v-model="form.animalDetail.isPending">
+                      <label class="custom-control-label small" for="animal_pending">
+                        ไม่มีหนังสือรับรองจรรยาบรรณสัตว์เพื่องานทางวิทยาศาสตร์
+                        อยู่ระหว่างเสนอคณะกรรมการจรรยาบรรณสัตว์เพื่องานทางวิทยาศาสตร์
+                      </label>
+                    </div>
+
+                    <div v-if="form.animalDetail.isPending" class="d-flex align-items-center mt-2 ml-4 flex-wrap"
+                      style="gap: 10px;">
+                      <span class="small">วันที่ยื่นโครงการ</span>
+                      <CInput type="date" v-model="form.animalDetail.applyDate" size="sm" class="mb-0"
+                        style="width: 150px;" />
+                      <div class="custom-file-upload border p-1 rounded bg-light d-flex align-items-center">
+                        <input type="file" @change="handleFileUpload($event, 'animal')" class="small">
+                      </div>
+                    </div>
+                  </div>
+
                 </div>
               </CCol>
             </CRow>
+
+
             <label class="font-weight-bold">19) หมายเหตุ</label>
             <quill-editor v-model="form.Note" :options="editorOption" class="mb-4" />
 
@@ -199,32 +280,32 @@ export default {
       },
       // ปรับประเภททุนให้ตรงตามหัวข้อ 14.1 - 14.4
       budgetTypes: [
-      { label: "ทุนนักวิจัยรุ่นใหม่", value: "new" },
-      { label: "ทุนพัฒนานักวิจัย", value: "dev" },
-      { label: "ทุนวิจัยที่สอดคล้องกับยุทธศาสตร์", value: "strategic" },
-      { label: "ทุนต่อยอดสู่ภาคอุตสาหกรรม", value: "industrial" }
-    ],
+        { label: "ทุนนักวิจัยรุ่นใหม่", value: "new" },
+        { label: "ทุนพัฒนานักวิจัย", value: "dev" },
+        { label: "ทุนวิจัยที่สอดคล้องกับยุทธศาสตร์", value: "strategic" },
+        { label: "ทุนต่อยอดสู่ภาคอุตสาหกรรม", value: "industrial" }
+      ],
       // รายละเอียดผลลัพธ์แยกตามประเภททุน
       outcomes: {
-      newResearcher: [
-        "นำเสนอในการประชุมวิชาการระดับนานาชาติ โดยต้องเป็นบทความฉบับสมบูรณ์ (Fullpaper) ที่ได้รับการตีพิมพ์ในรายงานสืบเนื่องจากการประชุม (Proceedings)",
-        "ตีพิมพ์ในวารสารทางวิชาการที่มีรายชื่ออยู่ในฐานข้อมูล ตามประกาศ ก.พ.อ. เรื่องหลักเกณฑ์การพิจารณาวารสารทางวิชาการ สำหรับการเผยแพร่ผลงานทางวิชาการ",
-        "ตีพิมพ์วารสารทางวิชาการระดับชาติ ต้องเป็นวารสารทางวิชาการที่ปรากฏในฐานข้อมูลTCI กลุ่มที่ 1 หรือ กลุ่มที่ 2",
-        "อนุสิทธิบัตร/สิทธิบัตร (มีเลขคำขอฯ)"
-      ],
-      devResearcher: [
-        "ตีพิมพ์ในวารสารทางวิชาการระดับนานาชาติที่มีรายชื่ออยู่ในฐานข้อมูลตาม ประกาศก.พ.อ.เรื่องหลักเกณฑ์การพิจารณาวารสารทางวิชาการสำหรับการเผยแพร่ผลงานทางวิชาการ พ.ศ.2562",
-        "ตีพิมพ์วารสารทางวิชาการระดับชาติ ต้องเป็นวารสารทางวิชาการที่ปรากฏในฐานข้อมูล TCI กลุ่มที่ 1 เท่านั้น",
-        "อนุสิทธิบัตร/สิทธิบัตร (มีเลขคำขอฯ)"
-      ],
-      strategic: [
-        "ตีพิมพ์ในวารสารทางวิชาการระดับนานาชาติที่มีรายชื่ออยู่ในฐานข้อมูลตาม ประกาศ ก.พ.อ. เรื่องหลักเกณฑ์การพิจารณาวารสารทางวิชาการสำหรับการเผยแพร่ผลงานทางวิชาการ พ.ศ.2562",
-        "ตีพิมพ์วารสารทางวิชาการระดับชาติ ต้องเป็นวารสารทางวิชาการที่ปรากฏในฐานข้อมูล TCI กลุ่มที่ 1 เท่านั้น",
-        "อนุสิทธิบัตร/สิทธิบัตร (มีเลขคำขอฯ)"
-      ],
-      industrial: [
-        "การยื่นขอจดทะเบียนทรัพย์สินทางปัญญา (มีเลขคำขอฯ)"
-      ]
+        newResearcher: [
+          "นำเสนอในการประชุมวิชาการระดับนานาชาติ โดยต้องเป็นบทความฉบับสมบูรณ์ (Fullpaper) ที่ได้รับการตีพิมพ์ในรายงานสืบเนื่องจากการประชุม (Proceedings)",
+          "ตีพิมพ์ในวารสารทางวิชาการที่มีรายชื่ออยู่ในฐานข้อมูล ตามประกาศ ก.พ.อ. เรื่องหลักเกณฑ์การพิจารณาวารสารทางวิชาการ สำหรับการเผยแพร่ผลงานทางวิชาการ",
+          "ตีพิมพ์วารสารทางวิชาการระดับชาติ ต้องเป็นวารสารทางวิชาการที่ปรากฏในฐานข้อมูลTCI กลุ่มที่ 1 หรือ กลุ่มที่ 2",
+          "อนุสิทธิบัตร/สิทธิบัตร (มีเลขคำขอฯ)"
+        ],
+        devResearcher: [
+          "ตีพิมพ์ในวารสารทางวิชาการระดับนานาชาติที่มีรายชื่ออยู่ในฐานข้อมูลตาม ประกาศก.พ.อ.เรื่องหลักเกณฑ์การพิจารณาวารสารทางวิชาการสำหรับการเผยแพร่ผลงานทางวิชาการ พ.ศ.2562",
+          "ตีพิมพ์วารสารทางวิชาการระดับชาติ ต้องเป็นวารสารทางวิชาการที่ปรากฏในฐานข้อมูล TCI กลุ่มที่ 1 เท่านั้น",
+          "อนุสิทธิบัตร/สิทธิบัตร (มีเลขคำขอฯ)"
+        ],
+        strategic: [
+          "ตีพิมพ์ในวารสารทางวิชาการระดับนานาชาติที่มีรายชื่ออยู่ในฐานข้อมูลตาม ประกาศ ก.พ.อ. เรื่องหลักเกณฑ์การพิจารณาวารสารทางวิชาการสำหรับการเผยแพร่ผลงานทางวิชาการ พ.ศ.2562",
+          "ตีพิมพ์วารสารทางวิชาการระดับชาติ ต้องเป็นวารสารทางวิชาการที่ปรากฏในฐานข้อมูล TCI กลุ่มที่ 1 เท่านั้น",
+          "อนุสิทธิบัตร/สิทธิบัตร (มีเลขคำขอฯ)"
+        ],
+        industrial: [
+          "การยื่นขอจดทะเบียนทรัพย์สินทางปัญญา (มีเลขคำขอฯ)"
+        ]
       },
       researchTypeOptions: [
         { value: 'Science', label: 'ด้านวิทยาศาสตร์และเทคโนโลยี' },
@@ -247,22 +328,43 @@ export default {
         reference: "", methodology: "", scope: "", progressReport: "",
         expectedResults: [], integration: "", transferLevel: "ไม่มี",
         ethics: { human: false, animal: false }, remark: "",
-      selectedOutcomes: [] // สำหรับเก็บผลลัพธ์ที่ user ติ๊กเลือก
+        selectedOutcomes: [], standards: [], // เก็บค่า 'none', 'human', 'animal'
+        humanDetail: {
+          hasCert: false,
+          isPending: false,
+          applyDate: '',
+          file: null
+        },
+        animalDetail: {
+          hasCert: false,
+          isPending: false,
+          applyDate: '',
+          file: null
+        }
       },
-      
+
     };
   },
   watch: {
-  // เมื่อเปลี่ยนประเภททุน ให้ล้างค่าที่เคยเลือกไว้ในข้อ 14 เพื่อป้องกันข้อมูลปนกัน
-  'form.budgetType': function() {
-    this.form.selectedOutcomes = [];
-  }
-},
+    // เมื่อเปลี่ยนประเภททุน ให้ล้างค่าที่เคยเลือกไว้ในข้อ 14 เพื่อป้องกันข้อมูลปนกัน
+    'form.budgetType': function () {
+      this.form.selectedOutcomes = [];
+    },
+
+  },
   methods: {
     submit() { console.log(this.form); alert("บันทึกสำเร็จ"); },
     exportPDF() {
       const element = document.body;
       html2pdf().from(element).save("Research_Form.pdf");
+    },
+    handleFileUpload(event, type) {
+      const file = event.target.files[0];
+      if (type === 'human') {
+        this.form.humanDetail.file = file;
+      } else {
+        this.form.animalDetail.file = file;
+      }
     }
   }
 };
