@@ -10,21 +10,10 @@
 
         <div class="d-flex flex-wrap align-items-center" style="gap: 12px;">
           <div v-if="cat.options.length > 0" style="min-width: 350px;">
-            <CSelect 
-              :options="['', ...cat.options]" 
-              :value.sync="cat.selected" 
-              @change="addRow(ci)" 
-              placeholder="-- เลือกรายการย่อย --" 
-              custom 
-              class="mb-0 shadow-sm" 
-            />
+            <CSelect :options="['', ...cat.options]" :value.sync="cat.selected" @change="addRow(ci)" placeholder="-- เลือกรายการย่อย --" custom class="mb-0 shadow-sm" />
           </div>
-          <CButton color="info" variant="outline" size="sm" @click="addManualRow(ci)">
-            <CIcon name="cil-plus" class="mr-1"/> เพิ่มรายการเอง
-          </CButton>
-          <CButton color="dark" variant="outline" size="sm" @click="triggerFileUpload(ci)">
-            <CIcon name="cil-paperclip" class="mr-1"/> แนบเอกสาร
-          </CButton>
+          <CButton color="info" variant="outline" size="sm" @click="addManualRow(ci)"><CIcon name="cil-plus" class="mr-1"/> เพิ่มรายการเอง</CButton>
+          <CButton color="dark" variant="outline" size="sm" @click="triggerFileUpload(ci)"><CIcon name="cil-paperclip" class="mr-1"/> แนบเอกสาร</CButton>
         </div>
       </div>
 
@@ -33,7 +22,7 @@
           <thead class="bg-light text-center small font-weight-bold text-muted text-uppercase">
             <tr>
               <th style="width: 25%">รายการ</th>
-              <th style="width: 25%">รายละเอียดตัวคูณ (เกณฑ์ มฟล. 2569)</th>
+              <th style="width: 25%">รายละเอียด/เครื่องคิดเลข (เกณฑ์ มฟล. 2569)</th>
               <th style="width: 12%">งบรวม (บาท)</th>
               <th style="width: 10%">งวด 1</th>
               <th style="width: 10%">งวด 2</th>
@@ -42,35 +31,39 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-if="cat.rows.length === 0">
-              <td colspan="7" class="text-center py-4 text-muted small">ยังไม่มีข้อมูลในหมวดนี้</td>
-            </tr>
             <tr v-for="(r, ri) in cat.rows" :key="ri">
               <td class="px-3">
-                <div v-if="!r.isManual && !r.fileName" class="font-weight-bold text-dark small py-1 px-2">
-                  {{ r.name }}
-                </div>
+                <div v-if="!r.isManual && !r.fileUrl" class="font-weight-bold text-dark small py-1 px-2">{{ r.name }}</div>
                 <CInput v-else v-model="r.name" size="sm" class="mb-0" placeholder="ชื่อรายการ..." />
-                <small v-if="r.fileName" class="text-success d-block mt-1">
-                  <CIcon name="cil-file" size="sm"/> {{ r.fileName }}
-                </small>
+                
+                <div v-if="r.fileUrl" class="mt-2 d-flex align-items-center flex-wrap" style="gap: 6px;">
+                  <span :class="['badge px-2 py-1 text-uppercase', getFileBadgeClass(r.fileName)]" style="font-size: 10px; min-width: 35px; border-radius: 4px;">
+                    {{ getFileExtension(r.fileName) }}
+                  </span>
+                  <CButton 
+                    color="info" 
+                    variant="outline" 
+                    size="sm" 
+                    class="py-0 px-2 shadow-sm d-flex align-items-center" 
+                    style="font-size: 11px; height: 22px; border-radius: 4px;" 
+                    @click="viewFile(r.fileUrl)"
+                  >
+                    <CIcon name="cil-folder" size="sm" class="mr-1"/> ดูไฟล์
+                  </CButton>
+                  <small class="text-muted d-block w-100 mt-1" style="font-size: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    {{ r.fileName }}
+                  </small>
+                </div>
               </td>
 
               <td>
                 <div v-if="r.multipliers" class="d-flex align-items-center justify-content-center" style="gap: 5px;">
                   <div v-for="(m, mi) in r.multipliers" :key="mi" class="text-center">
-                    <CInput 
-                      type="number" 
-                      v-model.number="m.val" 
-                      size="sm" 
-                      class="mb-0 text-center" 
-                      style="width: 65px;" 
-                      @input="calculateRowTotal(r)" 
-                    />
+                    <CInput type="number" v-model.number="m.val" size="sm" class="mb-0 text-center" style="width: 65px;" @input="calculateRowTotal(r)" />
                     <small class="text-muted d-block" style="font-size: 10px">{{ m.label }}</small>
                   </div>
                 </div>
-                <CInput v-else v-model="r.detail" size="sm" class="mb-0" placeholder="รายละเอียด..." />
+                <CInput v-else v-model="r.detail" size="sm" class="mb-0" placeholder="เช่น 500*3" @input="calculateManual(r)" />
               </td>
 
               <td>
@@ -80,22 +73,12 @@
               </td>
 
               <td v-for="p in ['p1', 'p2', 'p3']" :key="p">
-                <CInput 
-                  type="number" 
-                  v-model.number="r[p]" 
-                  size="sm" 
-                  :class="['mb-0 text-right', r.errors[p] ? 'is-invalid-bg text-danger border-danger' : '']" 
-                  @input="validateInstallments(r, p)" 
-                />
-                <small v-if="r.errors[p]" class="text-danger d-block mt-1 font-weight-bold text-center" style="font-size: 9px;">
-                  {{ r.errors[p] }}
-                </small>
+                <CInput type="number" v-model.number="r[p]" size="sm" :class="['mb-0 text-right', r.errors[p] ? 'is-invalid-bg text-danger border-danger' : '']" @input="validateInstallments(r, p)" />
+                <small v-if="r.errors[p]" class="text-danger d-block mt-1 font-weight-bold text-center" style="font-size: 9px;">{{ r.errors[p] }}</small>
               </td>
               
               <td class="text-center">
-                <CButton color="danger" variant="ghost" size="sm" @click="removeRow(ci, ri)">
-                  <CIcon name="cil-trash"/>
-                </CButton>
+                <CButton color="danger" variant="ghost" size="sm" @click="removeRow(ci, ri)"><CIcon name="cil-trash"/></CButton>
               </td>
             </tr>
           </tbody>
@@ -112,14 +95,9 @@
               {{ grandTotal.toLocaleString() }} <small class="text-muted" style="font-size: 14px">บาท</small>
             </div>
           </div>
-          
           <div class="d-flex" style="gap: 12px;">
-            <CButton color="danger" variant="outline" class="px-4 py-2" @click="resetForm">
-              <CIcon name="cil-ban" class="mr-1"/> ล้างฟอร์มทั้งหมด
-            </CButton>
-            <CButton color="primary" class="px-5 py-2 font-weight-bold shadow-sm" @click="saveDraft">
-              <CIcon name="cil-save" class="mr-1"/> บันทึกแบบร่าง
-            </CButton>
+            <CButton color="danger" variant="outline" class="px-4 py-2" @click="resetForm"><CIcon name="cil-ban" class="mr-1"/> ล้างฟอร์มทั้งหมด</CButton>
+            <CButton color="primary" class="px-5 py-2 font-weight-bold shadow-sm" @click="saveDraft"><CIcon name="cil-save" class="mr-1"/> บันทึกแบบร่าง</CButton>
           </div>
         </div>
       </CCardBody>
@@ -134,43 +112,10 @@ export default {
     return {
       activeCategoryIndex: null,
       categories: [
-        this.makeCat("หมวดค่าตอบแทน", [
-          "ค่าตอบแทน – นักศึกษาช่วยงานด้านวิชาการ",
-          "ค่าตอบแทน – นักศึกษาช่วยงานทั่วไป",
-          "ค่าตอบแทน – ผู้ให้ข้อมูล",
-          "ค่าตอบแทน – ผู้ให้สัมภาษณ์",
-          "ค่าตอบแทน – ผู้ตอบแบบสอบถาม",
-          "ค่าตอบแทน – อาสาสมัคร"
-        ]),
-        this.makeCat("หมวดค่าใช้สอย", [
-          "ค่าใช้จ่ายในการจัดประชุม - ค่าอาหารกลางวัน (แนบกำหนดการ)",
-          "ค่าใช้จ่ายในการจัดประชุม - ค่าอาหารว่าง (แนบกำหนดการ)",
-          "ค่าธรรมเนียมการขอจริยธรรมการวิจัยในมนุษย์",
-          "ค่าจ้างเหมาวิเคราะห์ทดสอบทางวิทยาศาสตร์ (แนบ TOR)",
-          "ค่าจ้างเหมาวิเคราะห์ทางการแพทย์ (แนบ TOR)",
-          "ค่าจ้างเหมาผู้ช่วยเก็บข้อมูลในพื้นที่ (แนบ TOR)",
-          "ค่าจ้างเหมาผู้นำทางในพื้นที่ (ล่าม) (แนบ TOR)",
-          "ค่าจ้างเหมาถอดเทป (แนบ TOR)",
-          "ค่าจ้างเหมาอื่นๆ - ระบุ (แนบ TOR)",
-          "ค่าธรรมเนียมการใช้ห้องปฏิบัติการ (แนบอัตราค่าบริการหรือใบเสนอราคา)",
-          "ค่าถ่ายเอกสาร",
-          "ค่าไปรษณีย์และขนส่ง",
-          "ค่าบริการทางอินเตอร์เน็ต"
-        ]),
-        this.makeCat("หมวดค่าเดินทาง", [
-          "ค่ายานพาหนะเครื่องบินอาจารย์",
-          "ค่าพาหนะในการเดินทางไปปฏิบัติงาน (รถยนต์ส่วนบุคคล)",
-          "ค่าเช่ายานพาหนะรถตู้ (แนบ TOR)",
-          "ค่าที่พัก",
-          "ค่าเบี้ยเลี้ยง (กรณีเดินทางออกนอกพื้นที่จังหวัด)"
-        ]),
-        this.makeCat("หมวดค่าวัสดุ", [
-          "ค่าวัสดุสำนักงาน",
-          "ค่าวัสดุคอมพิวเตอร์",
-          "ค่าวัสดุวิทยาศาสตร์",
-          "น้ำมันเชื้อเพลิงพาหนะเช่า",
-          "ค่าเวชภัณฑ์ยา"
-        ]),
+        this.makeCat("หมวดค่าตอบแทน", ["ค่าตอบแทน – นักศึกษาช่วยงานด้านวิชาการ", "ค่าตอบแทน – นักศึกษาช่วยงานทั่วไป", "ค่าตอบแทน – อาสาสมัคร", "ค่าตอบแทน – ผู้ให้ข้อมูล"]),
+        this.makeCat("หมวดค่าใช้สอย", ["ค่าอาหารกลางวัน (120.-)", "ค่าอาหารว่าง (50.-)", "จ้างเหมาวิเคราะห์ทดสอบ (TOR)"]),
+        this.makeCat("หมวดค่าเดินทาง", ["ค่าเบี้ยเลี้ยง (350.-/วัน)", "ค่าที่พัก (เหมา 800.-)", "รถยนต์ส่วนบุคคล (4.-/กม.)"]),
+        this.makeCat("หมวดค่าวัสดุ", ["ค่าวัสดุสำนักงาน", "ค่าวัสดุคอมพิวเตอร์", "น้ำมันเชื้อเพลิงพาหนะเช่า"]),
         this.makeCat("หมวดค่าสาธารณูปโภค", []),
         this.makeCat("หมวดครุภัณฑ์", [])
       ]
@@ -178,47 +123,57 @@ export default {
   },
   computed: {
     grandTotal() {
-      return this.categories.reduce((sum, c) => {
-        const catSum = c.rows.reduce((s, r) => s + Number(r.total || 0), 0);
-        return sum + catSum;
-      }, 0);
+      return this.categories.reduce((sum, c) => sum + c.rows.reduce((s, r) => s + Number(r.total || 0), 0), 0);
     }
   },
   methods: {
-    makeCat(title, options = []) {
-      return { title, options, selected: "", rows: [] };
-    },
+    makeCat(title, options = []) { return { title, options, selected: "", rows: [] }; },
     addRow(ci) {
       const cat = this.categories[ci];
       if (!cat.selected) return;
       cat.rows.push(this.newRow(cat.selected, false, null, cat.title));
       cat.selected = "";
     },
-    addManualRow(ci) {
-      const cat = this.categories[ci];
-      cat.rows.push(this.newRow("", true, null, cat.title));
-    },
-    newRow(name, isManual, fileName = null, catTitle = "") {
+    addManualRow(ci) { this.categories[ci].rows.push(this.newRow("", true, null, this.categories[ci].title)); },
+    
+    newRow(name, isManual, fileName = null, catTitle = "", fileUrl = null) {
       let multipliers = null;
-      // อัตรา มฟล. 2569
-      if (name.includes("วิชาการ")) {
-        multipliers = [{ label: "ชม.", val: 0 }, { label: "คน", val: 0 }, { label: "บาท", val: 60 }];
-      } else if (name.includes("ทั่วไป")) {
-        multipliers = [{ label: "ชม.", val: 0 }, { label: "คน", val: 0 }, { label: "บาท", val: 30 }];
-      } else if (name.includes("อาหารกลางวัน")) {
-        multipliers = [{ label: "มื้อ", val: 0 }, { label: "คน", val: 0 }, { label: "บาท", val: 120 }];
-      } else if (name.includes("เบี้ยเลี้ยง")) {
-        multipliers = [{ label: "วัน", val: 0 }, { label: "คน", val: 0 }, { label: "บาท", val: 350 }];
-      } else if (name.includes("รถยนต์ส่วนบุคคล")) {
-        multipliers = [{ label: "กม.", val: 0 }, { label: "รอบ", val: 2 }, { label: "บาท", val: 4 }];
-      } else if (catTitle === "หมวดค่าวัสดุ") {
-        multipliers = [{ label: "หน่วย", val: 0 }, { label: "บาท", val: 0 }];
-      }
+      // อัตรา มฟล. 2569 [cite: 86, 88, 91]
+      if (name.includes("วิชาการ")) multipliers = [{ label: "ชม.", val: 0 }, { label: "คน", val: 0 }, { label: "บาท", val: 60 }];
+      else if (name.includes("ทั่วไป")) multipliers = [{ label: "ชม.", val: 0 }, { label: "คน", val: 0 }, { label: "บาท", val: 30 }];
+      else if (name.includes("อาหารกลางวัน")) multipliers = [{ label: "มื้อ", val: 0 }, { label: "คน", val: 0 }, { label: "บาท", val: 120 }];
+      else if (name.includes("อาหารว่าง")) multipliers = [{ label: "มื้อ", val: 0 }, { label: "คน", val: 0 }, { label: "บาท", val: 50 }];
+      else if (name.includes("เบี้ยเลี้ยง")) multipliers = [{ label: "วัน", val: 0 }, { label: "คน", val: 0 }, { label: "บาท", val: 350 }];
+      else if (name.includes("รถยนต์ส่วนบุคคล")) multipliers = [{ label: "กม.", val: 0 }, { label: "รอบ", val: 2 }, { label: "บาท", val: 4 }];
+      else if (catTitle === "หมวดค่าวัสดุ" || name.includes("จ้างเหมา")) multipliers = [{ label: "หน่วย", val: 0 }, { label: "บาท", val: 0 }];
 
       return { 
         name, detail: "", p1: 0, p2: 0, p3: 0, total: 0, 
-        isManual, fileName, multipliers, errors: { p1: "", p2: "", p3: "" } 
+        isManual, fileName, fileUrl, multipliers, 
+        errors: { p1: "", p2: "", p3: "" } 
       };
+    },
+
+    getFileExtension(filename) { return filename ? filename.split('.').pop() : ""; },
+    getFileBadgeClass(filename) {
+      const ext = this.getFileExtension(filename).toLowerCase();
+      if (ext === 'pdf') return 'badge-danger';
+      if (['xls', 'xlsx', 'csv'].includes(ext)) return 'badge-success';
+      if (['doc', 'docx'].includes(ext)) return 'badge-primary';
+      if (['jpg', 'jpeg', 'png'].includes(ext)) return 'badge-warning';
+      return 'badge-secondary';
+    },
+
+    calculateManual(row) {
+      if (!row.detail) { row.total = 0; return; }
+      try {
+        const sanitized = row.detail.replace(/[^-+*/().0-9]/g, '');
+        if (sanitized) {
+          const result = new Function(`return ${sanitized}`)();
+          row.total = isFinite(result) ? result : 0;
+          row.p1 = 0; row.p2 = 0; row.p3 = 0;
+        }
+      } catch (e) { /* Ignore calculation errors while typing */ }
     },
     calculateRowTotal(row) {
       if (row.multipliers) {
@@ -228,42 +183,45 @@ export default {
     },
     validateInstallments(row, field) {
       const sum = Number(row.p1 || 0) + Number(row.p2 || 0) + Number(row.p3 || 0);
-      if (sum > row.total) {
-        row.errors[field] = `เกินงบรวม!`;
-        row[field] = 0;
-      } else {
-        row.errors.p1 = ""; row.errors.p2 = ""; row.errors.p3 = "";
-      }
+      if (sum > row.total) { row.errors[field] = `เกินงบ!`; row[field] = 0; }
+      else { row.errors.p1 = ""; row.errors.p2 = ""; row.errors.p3 = ""; }
     },
-    triggerFileUpload(ci) {
-      this.activeCategoryIndex = ci;
-      this.$refs.fileInput.click();
-    },
+    triggerFileUpload(ci) { this.activeCategoryIndex = ci; this.$refs.fileInput.click(); },
     onFilePicked(event) {
       const file = event.target.files[0];
       if (file && this.activeCategoryIndex !== null) {
+        const fileUrl = URL.createObjectURL(file);
         const cat = this.categories[this.activeCategoryIndex];
-        cat.rows.push(this.newRow("", true, file.name, cat.title));
+        cat.rows.push(this.newRow("", true, file.name, cat.title, fileUrl));
       }
-      event.target.value = "";
+      event.target.value = ""; 
     },
+    viewFile(url) { window.open(url, '_blank'); },
     removeRow(ci, ri) {
+      const row = this.categories[ci].rows[ri];
+      if (row.fileUrl) URL.revokeObjectURL(row.fileUrl);
       this.categories[ci].rows.splice(ri, 1);
     },
     resetForm() {
-      this.categories.forEach(c => { c.rows = []; });
+      this.categories.forEach(c => {
+        c.rows.forEach(r => { if (r.fileUrl) URL.revokeObjectURL(r.fileUrl); });
+        c.rows = [];
+      });
     },
-    saveDraft() {
-      alert("บันทึกเรียบร้อย");
-    }
+    saveDraft() { alert("บันทึกเรียบร้อย"); }
   }
 };
 </script>
 
 <style scoped>
 .table td .form-control { border: 1px solid #d8dbe0; }
-.table td .form-control:focus { border-color: #321fdb; box-shadow: none; }
 .is-invalid-bg { background-color: #fff5f5 !important; transition: all 0.3s ease; }
 .bg-light { background-color: #f8f9fa !important; }
 .border-primary { border-color: #321fdb !important; }
+/* Badge สีมาตรฐาน Bootstrap  */
+.badge-danger { background-color: #e55353; color: white; }
+.badge-success { background-color: #2eb85c; color: white; }
+.badge-primary { background-color: #321fdb; color: white; }
+.badge-warning { background-color: #f9b115; color: white; }
+.badge-secondary { background-color: #ced4da; color: #4f5d73; }
 </style>

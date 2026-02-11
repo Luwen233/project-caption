@@ -14,8 +14,15 @@
               <CCol md="12">
                 <CInput label="ชื่อโครงการ (ภาษาอังกฤษ)" v-model="form.titleEN" placeholder="..." />
               </CCol>
-              <CCol md="6">
-                <CSelect label="2) ประเภททุน" :options="budgetTypes" :value.sync="form.budgetType" />
+              <CCol md="12" class="mb-4">
+                <label class="font-weight-bold">2) ประเภททุน *</label>
+                <div class="d-flex flex-wrap border rounded p-3 bg-light" style="gap: 20px;">
+                  <div v-for="type in budgetTypes" :key="type.value" class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" :id="type.value" :value="type.label"
+                      v-model="form.budgetType">
+                    <label class="form-check-label" :for="type.value">{{ type.label }}</label>
+                  </div>
+                </div>
               </CCol>
               <CCol md="6">
                 <CSelect label="3) ความร่วมมือ" :options="['ไม่มี', 'มี']" :value.sync="form.cooperation" />
@@ -52,18 +59,74 @@
             <label class="font-weight-bold">13) ผลงานตามระยะเวลาการรายงาน</label>
             <quill-editor v-model="form.progressReport" :options="editorOption" class="mb-4" />
 
-            <CRow>
-              <CCol md="6">
-                <label class="font-weight-bold">14) ผลลัพธ์ที่คาดว่าจะได้รับ</label>
-                <div class="mt-2">
-                  <div v-for="(opt, i) in resultOptions" :key="i" class="form-check form-check-inline">
-                    <input type="checkbox" :id="'res' + i" :value="opt" v-model="form.expectedResults"
-                      class="form-check-input">
-                    <label :for="'res' + i" class="form-check-label">{{ opt }}</label>
+
+            <CRow class="mb-4">
+              <CCol md="12">
+                <label class="font-weight-bold">2) ประเภททุน *</label>
+                <div class="d-flex flex-wrap border rounded p-3 bg-light" style="gap: 25px;">
+                  <div v-for="type in budgetTypes" :key="type.value" class="custom-control custom-radio">
+                    <input type="radio" :id="'radio-' + type.value" :value="type.label" v-model="form.budgetType"
+                      class="custom-control-input">
+                    <label class="custom-control-label" :for="'radio-' + type.value">{{ type.label }}</label>
                   </div>
                 </div>
               </CCol>
             </CRow>
+
+            <hr class="my-4">
+
+            <CRow>
+              <CCol md="12">
+                <h5 class="font-weight-bold mb-4 text-dark">
+                  14) ผลลัพธ์ที่คาดว่าจะได้รับจากงานวิจัยเมื่อเสร็จสิ้นการวิจัย *
+                </h5>
+
+                <div v-if="form.budgetType === 'ทุนนักวิจัยรุ่นใหม่'"
+                  class="outcome-box p-3 border rounded bg-white shadow-sm mb-4">
+                  <h6 class="font-weight-bold text-primary mb-3">14.1 ทุนนักวิจัยรุ่นใหม่</h6>
+                  <div v-for="(item, index) in outcomes.newResearcher" :key="'opt1-' + index"
+                    class="custom-control custom-checkbox mb-2 ml-2">
+                    <input type="checkbox" class="custom-control-input" :id="'chk1-' + index" :value="item"
+                      v-model="form.selectedOutcomes">
+                    <label class="custom-control-label small" :for="'chk1-' + index">{{ item }}</label>
+                  </div>
+                </div>
+
+                <div v-if="form.budgetType === 'ทุนพัฒนานักวิจัย'"
+                  class="outcome-box p-3 border rounded bg-white shadow-sm mb-4">
+                  <h6 class="font-weight-bold text-success mb-3">14.2 ทุนพัฒนานักวิจัย</h6>
+                  <div v-for="(item, index) in outcomes.devResearcher" :key="'opt2-' + index"
+                    class="custom-control custom-checkbox mb-2 ml-2">
+                    <input type="checkbox" class="custom-control-input" :id="'chk2-' + index" :value="item"
+                      v-model="form.selectedOutcomes">
+                    <label class="custom-control-label small" :for="'chk2-' + index">{{ item }}</label>
+                  </div>
+                </div>
+
+                <div v-if="form.budgetType === 'ทุนวิจัยที่สอดคล้องกับยุทธศาสตร์'"
+                  class="outcome-box p-3 border rounded bg-white shadow-sm mb-4">
+                  <h6 class="font-weight-bold text-warning mb-3">14.3 ทุนวิจัยที่สอดคล้องกับยุทธศาสตร์</h6>
+                  <div v-for="(item, index) in outcomes.strategic" :key="'opt3-' + index"
+                    class="custom-control custom-checkbox mb-2 ml-2">
+                    <input type="checkbox" class="custom-control-input" :id="'chk3-' + index" :value="item"
+                      v-model="form.selectedOutcomes">
+                    <label class="custom-control-label small" :for="'chk3-' + index">{{ item }}</label>
+                  </div>
+                </div>
+
+                <div v-if="form.budgetType === 'ทุนต่อยอดสู่ภาคอุตสาหกรรม'"
+                  class="outcome-box p-3 border rounded bg-white shadow-sm mb-4">
+                  <h6 class="font-weight-bold text-info mb-3">14.4 ทุนต่อยอดสู่ภาคอุตสาหกรรม</h6>
+                  <div v-for="(item, index) in outcomes.industrial" :key="'opt4-' + index"
+                    class="custom-control custom-checkbox mb-2 ml-2">
+                    <input type="checkbox" class="custom-control-input" :id="'chk4-' + index" :value="item"
+                      v-model="form.selectedOutcomes">
+                    <label class="custom-control-label small" :for="'chk4-' + index">{{ item }}</label>
+                  </div>
+                </div>
+              </CCol>
+            </CRow>
+
 
             <label class="font-weight-bold">15) การบูรณาการงานวิจัย</label>
             <quill-editor v-model="form.IntegrationResearch" :options="editorOption" class="mb-4" />
@@ -71,8 +134,9 @@
             <CRow>
               <CCol md="6">
                 <label class="font-weight-bold">16) ระดับการถ่ายทอดสู่สังคม</label>
-                <CInputRadioGroup :options="['ระดับชาติ', 'ระดับชุมชน', 'ไม่มี']" :checked.sync="form.transferLevel"
-                  inline />
+                <CInputRadioGroup
+                  :options="['สามารถนำไปถ่ายทอดเป็นต้นแบบและแนวทางได้ในระดับภูมิภาค ประเทศ หรือนานาชาติ', 'สามารถนำไปถ่ายทอดเป็นต้นแบบและแนวทางได้เฉพาะกลุ่มอาชีพ ชุมชน หรือจังหวัด', 'ไม่มีการนำไปถ่ายทอดสู่สังคม']"
+                  :checked.sync="form.transferLevel" />
               </CCol>
             </CRow>
             <CCard class="mt-4 shadow-sm">
@@ -133,9 +197,35 @@ export default {
           ]
         }
       },
-      // ... ข้อมูลอื่นๆ ใน data คงเดิม
-      budgetTypes: ["ทุนวิจัยทั่วไป", "ทุนพัฒนานักวิจัย", "ทุนต่อยอดอุตสาหกรรม"],
-      resultOptions: ["บทความวิชาการ", "สิทธิบัตร", "ต้นแบบ", "การถ่ายทอดสังคม"],
+      // ปรับประเภททุนให้ตรงตามหัวข้อ 14.1 - 14.4
+      budgetTypes: [
+      { label: "ทุนนักวิจัยรุ่นใหม่", value: "new" },
+      { label: "ทุนพัฒนานักวิจัย", value: "dev" },
+      { label: "ทุนวิจัยที่สอดคล้องกับยุทธศาสตร์", value: "strategic" },
+      { label: "ทุนต่อยอดสู่ภาคอุตสาหกรรม", value: "industrial" }
+    ],
+      // รายละเอียดผลลัพธ์แยกตามประเภททุน
+      outcomes: {
+      newResearcher: [
+        "นำเสนอในการประชุมวิชาการระดับนานาชาติ โดยต้องเป็นบทความฉบับสมบูรณ์ (Fullpaper) ที่ได้รับการตีพิมพ์ในรายงานสืบเนื่องจากการประชุม (Proceedings)",
+        "ตีพิมพ์ในวารสารทางวิชาการที่มีรายชื่ออยู่ในฐานข้อมูล ตามประกาศ ก.พ.อ. เรื่องหลักเกณฑ์การพิจารณาวารสารทางวิชาการ สำหรับการเผยแพร่ผลงานทางวิชาการ",
+        "ตีพิมพ์วารสารทางวิชาการระดับชาติ ต้องเป็นวารสารทางวิชาการที่ปรากฏในฐานข้อมูลTCI กลุ่มที่ 1 หรือ กลุ่มที่ 2",
+        "อนุสิทธิบัตร/สิทธิบัตร (มีเลขคำขอฯ)"
+      ],
+      devResearcher: [
+        "ตีพิมพ์ในวารสารทางวิชาการระดับนานาชาติที่มีรายชื่ออยู่ในฐานข้อมูลตาม ประกาศก.พ.อ.เรื่องหลักเกณฑ์การพิจารณาวารสารทางวิชาการสำหรับการเผยแพร่ผลงานทางวิชาการ พ.ศ.2562",
+        "ตีพิมพ์วารสารทางวิชาการระดับชาติ ต้องเป็นวารสารทางวิชาการที่ปรากฏในฐานข้อมูล TCI กลุ่มที่ 1 เท่านั้น",
+        "อนุสิทธิบัตร/สิทธิบัตร (มีเลขคำขอฯ)"
+      ],
+      strategic: [
+        "ตีพิมพ์ในวารสารทางวิชาการระดับนานาชาติที่มีรายชื่ออยู่ในฐานข้อมูลตาม ประกาศ ก.พ.อ. เรื่องหลักเกณฑ์การพิจารณาวารสารทางวิชาการสำหรับการเผยแพร่ผลงานทางวิชาการ พ.ศ.2562",
+        "ตีพิมพ์วารสารทางวิชาการระดับชาติ ต้องเป็นวารสารทางวิชาการที่ปรากฏในฐานข้อมูล TCI กลุ่มที่ 1 เท่านั้น",
+        "อนุสิทธิบัตร/สิทธิบัตร (มีเลขคำขอฯ)"
+      ],
+      industrial: [
+        "การยื่นขอจดทะเบียนทรัพย์สินทางปัญญา (มีเลขคำขอฯ)"
+      ]
+      },
       researchTypeOptions: [
         { value: 'Science', label: 'ด้านวิทยาศาสตร์และเทคโนโลยี' },
         { value: 'Health', label: 'ด้านวิทยาศาสตร์สุขภาพ' },
@@ -156,10 +246,18 @@ export default {
         keywords: "", importance: "", objective: "", literature: "",
         reference: "", methodology: "", scope: "", progressReport: "",
         expectedResults: [], integration: "", transferLevel: "ไม่มี",
-        ethics: { human: false, animal: false }, remark: ""
-      }
+        ethics: { human: false, animal: false }, remark: "",
+      selectedOutcomes: [] // สำหรับเก็บผลลัพธ์ที่ user ติ๊กเลือก
+      },
+      
     };
   },
+  watch: {
+  // เมื่อเปลี่ยนประเภททุน ให้ล้างค่าที่เคยเลือกไว้ในข้อ 14 เพื่อป้องกันข้อมูลปนกัน
+  'form.budgetType': function() {
+    this.form.selectedOutcomes = [];
+  }
+},
   methods: {
     submit() { console.log(this.form); alert("บันทึกสำเร็จ"); },
     exportPDF() {
