@@ -1,387 +1,394 @@
 <template>
-  <div class="container-fluid px-4 py-4">
-    <CRow>
-      <CCol sm="12">
-        <CCard class="shadow-sm">
-          <CCardHeader>
-            <strong>1-4) ข้อมูลทั่วไปของโครงการ</strong>
-          </CCardHeader>
-          <CCardBody>
-            <CRow>
-              <CCol md="12">
-                <CInput label="1) ชื่อโครงการ (ภาษาไทย)" v-model="form.titleTH" placeholder="..." />
-              </CCol>
-              <CCol md="12">
-                <CInput label="ชื่อโครงการ (ภาษาอังกฤษ)" v-model="form.titleEN" placeholder="..." />
-              </CCol>
-              <CCol md="12" class="mb-4">
-                <label class="font-weight-bold">2) ประเภททุน *</label>
-                <div class="d-flex flex-wrap border rounded p-3 bg-light" style="gap: 20px;">
-                  <div v-for="type in budgetTypes" :key="type.value" class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" :id="type.value" :value="type.label"
-                      v-model="form.budgetType">
-                    <label class="form-check-label" :for="type.value">{{ type.label }}</label>
-                  </div>
+  <div class="container-fluid px-0 bg-light min-vh-100">
+    <div class="w-100 p-4">
+
+      <CCard class="shadow-sm w-100 mb-4 border-0">
+        <CCardHeader class="bg-primary text-white py-3">
+          <h5 class="m-0 font-weight-bold">
+            <CIcon name="cil-file" class="mr-2" /> 1-4) ข้อมูลทั่วไปของโครงการ
+          </h5>
+        </CCardHeader>
+        <CCardBody class="p-4 bg-white">
+          <CRow>
+            <CCol md="12" class="mb-4">
+              <h5 class="font-weight-bold text-dark mb-3">1) ชื่อโครงการ *</h5>
+              <div class="p-3 border rounded bg-light shadow-sm">
+                <CInput label="ชื่อโครงการ (ภาษาไทย)" v-model="form.titleTH" placeholder="กรุณาระบุชื่อโครงการภาษาไทย"
+                  class="mb-3" />
+                <CInput label="ชื่อโครงการ (ภาษาอังกฤษ)" v-model="form.titleEN" placeholder="Project Title in English"
+                  class="mb-0" />
+              </div>
+            </CCol>
+
+            <CCol md="12" class="mb-4">
+              <h5 class="font-weight-bold text-dark mb-3">2) ประเภททุน *</h5>
+              <div class="d-flex flex-wrap border rounded p-3 bg-white shadow-sm" style="gap: 20px;">
+                <div v-for="type in budgetTypes" :key="type.value" class="custom-control custom-radio">
+                  <input class="custom-control-input" type="radio" :id="'type-' + type.value" :value="type.label"
+                    v-model="form.budgetType">
+                  <label class="custom-control-label font-weight-bold" :for="'type-' + type.value"
+                    style="cursor: pointer;">
+                    {{ type.label }}
+                  </label>
                 </div>
+              </div>
+            </CCol>
+
+            <CCol lg="6" md="12" class="mb-4">
+              <h5 class="font-weight-bold text-dark mb-3">3) ความร่วมมือ *</h5>
+              <CSelect :options="['ไม่มี', 'มี']" :value.sync="form.cooperation" class="shadow-sm" />
+              <div v-if="form.cooperation === 'มี'" class="mt-3">
+                <CInput label="รายละเอียดความร่วมมือ" v-model="form.cooperationDetail"
+                  placeholder="ระบุหน่วยงานที่ร่วมมือ" />
+              </div>
+            </CCol>
+
+            <CCol lg="6" md="12" class="mb-4">
+              <h5 class="font-weight-bold text-dark mb-3">4) ประเภทงานวิจัย *</h5>
+              <CSelect :options="researchTypeOptions" :value.sync="form.researchType" class="shadow-sm" />
+            </CCol>
+          </CRow>
+        </CCardBody>
+      </CCard>
+
+      <CCard class="shadow-sm w-100 mb-4 border-0">
+        <CCardHeader class="bg-primary text-white py-3">
+          <h5 class="m-0 font-weight-bold">
+            <CIcon name="cil-people" class="mr-2" /> ส่วน ก) : สาระสำคัญของข้อเสนอโครงการวิจัย — คณะผู้วิจัย
+          </h5>
+        </CCardHeader>
+        <CCardBody class="p-4">
+          <h5 class="font-weight-bold mb-4 text-dark">1) คณะผู้วิจัย</h5>
+
+          <div class="border rounded p-4 mb-4 bg-light shadow-sm w-100">
+            <h6 class="font-weight-bold text-primary mb-3 border-bottom pb-2">
+              <CIcon name="cil-user" class="mr-2" /> 1.1 หัวหน้าโครงการวิจัย
+            </h6>
+            <CRow>
+              <CCol lg="4" md="6">
+                <CInput label="ชื่อ-นามสกุล *" v-model="form.researchers.mainResearcher.name" />
               </CCol>
+              <CCol lg="4" md="6">
+                <CInput label="สังกัดหน่วยงาน *" v-model="form.researchers.mainResearcher.affiliation" />
+              </CCol>
+              <CCol lg="4" md="6">
+                <CInput label="เบอร์โทรศัพท์ *" v-model="form.researchers.mainResearcher.phone" />
+              </CCol>
+              <CCol lg="6" md="6">
+                <CInput label="E-mail address *" v-model="form.researchers.mainResearcher.email" type="email" />
+              </CCol>
+              <CCol lg="6" md="12">
+                <CInput label="สัดส่วนการวิจัย (%) *" v-model="form.researchers.mainResearcher.code" type="number" />
+              </CCol>
+            </CRow>
+          </div>
 
-              <CRow class="w-100 m-0">
-                <CCol md="12" class="px-0">
-                  <CCard class="mt-4 shadow-sm w-100">
-                    <CCardHeader class="bg-primary text-white">
-                      <h5 class="m-0 font-weight-bold">ส่วน ก) : สาระสำคัญของข้อเสนอโครงการวิจัย — คณะผู้วิจัย</h5>
-                    </CCardHeader>
-                    <CCardBody class="p-4">
-
-                      <div class="mb-5 w-100">
-                        <h5 class="font-weight-bold mb-3 text-dark">1) คณะผู้วิจัย</h5>
-
-                        <div class="border rounded p-4 mb-4 bg-light shadow-sm w-100">
-                          <h6 class="font-weight-bold text-primary mb-3 border-bottom pb-2">
-                            <CIcon name="cil-user" class="mr-2" /> 1.1 หัวหน้าโครงการวิจัย
-                          </h6>
-                          <CRow>
-                            <CCol lg="4" md="6" sm="12">
-                              <CInput label="ชื่อ-นามสกุล *" v-model="form.researchers.mainResearcher.name"
-                                placeholder="ระบุชื่อ-นามสกุล" class="w-100" />
-                            </CCol>
-                            <CCol lg="4" md="6" sm="12">
-                              <CInput label="สังกัดหน่วยงาน *" v-model="form.researchers.mainResearcher.affiliation"
-                                placeholder="เช่น สำนักวิชา..." class="w-100" />
-                            </CCol>
-                            <CCol lg="4" md="6" sm="12">
-                              <CInput label="เบอร์โทรศัพท์ *" v-model="form.researchers.mainResearcher.phone"
-                                placeholder="0xx-xxxxxxx" class="w-100" />
-                            </CCol>
-                            <CCol lg="6" md="6" sm="12">
-                              <CInput label="E-mail address *" v-model="form.researchers.mainResearcher.email"
-                                type="email" placeholder="email@mfu.ac.th" class="w-100" />
-                            </CCol>
-                            <CCol lg="6" md="12" sm="12">
-                              <CInput label="สัดส่วนการวิจัย (%) *" v-model="form.researchers.mainResearcher.code"
-                                placeholder="เช่น 60" type="number" class="w-100" />
-                            </CCol>
-                          </CRow>
-                        </div>
-
-                        <div class="border rounded p-4 mb-4 bg-white shadow-sm border-success w-100">
-                          <div
-                            class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2 flex-wrap">
-                            <h6 class="font-weight-bold text-success mb-2">
-                              <CIcon name="cil-people" class="mr-2" /> 1.2 ผู้ร่วมโครงการวิจัย (ถ้ามี)
-                            </h6>
-                            <CButton color="success" size="sm" variant="outline" @click="addCoResearcher" class="mb-2">
-                              <CIcon name="cil-plus" class="mr-1" /> เพิ่มผู้ร่วมโครงการ
-                            </CButton>
-                          </div>
-
-                          <div v-for="(researcher, index) in form.researchers.coResearchers" :key="'co-' + index"
-                            class="border rounded p-3 mb-3 bg-light position-relative w-100 shadow-none">
-                            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
-                              <span class="badge badge-success px-3 py-2 mb-2 shadow-sm">ผู้ร่วมโครงการคนที่ {{ index +
-                                1 }}</span>
-                              <CButton color="danger" size="sm" variant="ghost" @click="removeCoResearcher(index)"
-                                class="mb-2">
-                                <CIcon name="cil-trash" class="mr-1" /> ลบรายการนี้
-                              </CButton>
-                            </div>
-                            <CRow>
-                              <CCol lg="4" md="6" sm="12">
-                                <CInput label="ชื่อ-นามสกุล *" v-model="researcher.name" class="w-100" />
-                              </CCol>
-                              <CCol lg="4" md="6" sm="12">
-                                <CInput label="สังกัดหน่วยงาน *" v-model="researcher.affiliation" class="w-100" />
-                              </CCol>
-                              <CCol lg="4" md="6" sm="12">
-                                <CInput label="เบอร์โทรศัพท์ *" v-model="researcher.phone" class="w-100" />
-                              </CCol>
-                              <CCol lg="6" md="6" sm="12">
-                                <CInput label="E-mail address *" v-model="researcher.email" class="w-100" />
-                              </CCol>
-                              <CCol lg="6" md="12" sm="12">
-                                <CInput label="สัดส่วนการวิจัย (%) *" v-model="researcher.code" type="number"
-                                  class="w-100" />
-                              </CCol>
-                            </CRow>
-                          </div>
-
-                          <div v-if="form.researchers.coResearchers.length === 0"
-                            class="text-center text-muted py-5 w-100">
-                            <CIcon name="cil-info" class="mr-1" size="xl" /><br />
-                            <em>ยังไม่มีข้อมูลผู้ร่วมโครงการ</em>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="mb-4 w-100">
-                        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
-                          <h5 class="font-weight-bold text-dark mb-2">2) ที่ปรึกษาโครงการวิจัย (ถ้ามี)</h5>
-                          <CButton color="info" size="sm" variant="outline" @click="addAdvisor" class="mb-2">
-                            <CIcon name="cil-plus" class="mr-1" /> เพิ่มที่ปรึกษาโครงการ
-                          </CButton>
-                        </div>
-
-                        <div v-for="(advisor, index) in form.researchers.advisors" :key="'adv-' + index"
-                          class="border rounded p-4 mb-3 bg-light shadow-sm border-info w-100">
-                          <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
-                            <h6 class="font-weight-bold text-info mb-2 border-left-info pl-3">ที่ปรึกษาคนที่ {{ index +
-                              1 }}</h6>
-                            <CButton color="danger" size="sm" variant="ghost" @click="removeAdvisor(index)"
-                              class="mb-2">
-                              <CIcon name="cil-trash" class="mr-1" /> ลบออก
-                            </CButton>
-                          </div>
-                          <CRow>
-                            <CCol lg="4" md="6" sm="12">
-                              <CInput label="ชื่อ-นามสกุล *" v-model="advisor.name" class="w-100" />
-                            </CCol>
-                            <CCol lg="4" md="6" sm="12">
-                              <CInput label="สังกัดหน่วยงาน *" v-model="advisor.affiliation" class="w-100" />
-                            </CCol>
-                            <CCol lg="4" md="6" sm="12">
-                              <CInput label="เบอร์โทรศัพท์ *" v-model="advisor.phone" class="w-100" />
-                            </CCol>
-                            <CCol lg="12" md="12" sm="12">
-                              <CInput label="E-mail address *" v-model="advisor.email" class="w-100" />
-                            </CCol>
-                          </CRow>
-                        </div>
-
-                        <div v-if="form.researchers.advisors.length === 0"
-                          class="text-center text-muted py-5 small border rounded border-dashed w-100">
-                          <em>-- ยังไม่มีข้อมูลที่ปรึกษาโครงการ --</em>
-                        </div>
-                      </div>
-
-                    </CCardBody>
-                  </CCard>
+          <div class="border rounded p-4 mb-4 bg-white shadow-sm border-success w-100">
+            <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+              <h6 class="font-weight-bold text-success mb-0">
+                <CIcon name="cil-people" class="mr-2" /> 1.2 ผู้ร่วมโครงการวิจัย (ถ้ามี)
+              </h6>
+              <CButton color="success" size="sm" variant="outline" @click="addCoResearcher">
+                <CIcon name="cil-plus" /> เพิ่มผู้ร่วม
+              </CButton>
+            </div>
+            <div v-for="(r, idx) in form.researchers.coResearchers" :key="'co-' + idx"
+              class="border rounded p-3 mb-3 bg-light position-relative w-100">
+              <div class="d-flex justify-content-between mb-3">
+                <span class="badge badge-success px-3">คนที่ {{ idx + 1 }}</span>
+                <CButton color="danger" size="sm" variant="ghost" @click="removeCoResearcher(idx)">
+                  <CIcon name="cil-trash" />
+                </CButton>
+              </div>
+              <CRow>
+                <CCol lg="4" md="6">
+                  <CInput label="ชื่อ-นามสกุล *" v-model="r.name" />
+                </CCol>
+                <CCol lg="4" md="6">
+                  <CInput label="สังกัดหน่วยงาน *" v-model="r.affiliation" />
+                </CCol>
+                <CCol lg="4" md="6">
+                  <CInput label="เบอร์โทรศัพท์ *" v-model="r.phone" />
+                </CCol>
+                <CCol lg="6" md="6">
+                  <CInput label="E-mail *" v-model="r.email" />
+                </CCol>
+                <CCol lg="6" md="12">
+                  <CInput label="สัดส่วนการวิจัย (%) *" v-model="r.code" type="number" />
                 </CCol>
               </CRow>
+            </div>
+            <div v-if="form.researchers.coResearchers.length === 0" class="text-center text-muted py-4"><em>--
+                ยังไม่มีข้อมูลผู้ร่วมโครงการ --</em></div>
+          </div>
 
-              <CCol md="12">
-                <CSelect label="3) ความร่วมมือ" :options="['ไม่มี', 'มี']" :value.sync="form.cooperation" />
+          <div class="d-flex justify-content-between align-items-center mb-3 mt-5">
+            <h5 class="font-weight-bold text-dark mb-0">2) ที่ปรึกษาโครงการวิจัย (ถ้ามี)</h5>
+            <CButton color="info" size="sm" variant="outline" @click="addAdvisor">
+              <CIcon name="cil-plus" /> เพิ่มที่ปรึกษา
+            </CButton>
+          </div>
+          <div v-for="(adv, idx) in form.researchers.advisors" :key="'adv-' + idx"
+            class="border rounded p-4 mb-3 bg-light shadow-sm border-info w-100">
+            <div class="d-flex justify-content-between mb-3 align-items-center">
+              <h6 class="font-weight-bold text-info mb-0">ที่ปรึกษาคนที่ {{ idx + 1 }}</h6>
+              <CButton color="danger" size="sm" variant="ghost" @click="removeAdvisor(idx)">
+                <CIcon name="cil-trash" />
+              </CButton>
+            </div>
+            <CRow>
+              <CCol lg="4" md="6">
+                <CInput label="ชื่อ-นามสกุล *" v-model="adv.name" />
               </CCol>
-              <CCol md="12" v-if="form.cooperation === 'มี'">
-                <CInput label="รายละเอียดความร่วมมือ" v-model="form.cooperationDetail" />
+              <CCol lg="4" md="6">
+                <CInput label="สังกัดหน่วยงาน *" v-model="adv.affiliation" />
               </CCol>
-              <CCol md="12">
-                <CSelect label="4) ประเภทงานวิจัย" :options="researchTypeOptions" :value.sync="form.researchType" />
+              <CCol lg="4" md="6">
+                <CInput label="เบอร์โทรศัพท์ *" v-model="adv.phone" />
+              </CCol>
+              <CCol lg="12">
+                <CInput label="E-mail address *" v-model="adv.email" />
               </CCol>
             </CRow>
-          </CCardBody>
-        </CCard>
+          </div>
+        </CCardBody>
+      </CCard>
 
+      <CCard class="shadow-sm w-100 mb-4 border-0">
+        <CCardHeader class="bg-primary text-white py-3">
+          <h5 class="m-0 font-weight-bold">
+            <CIcon name="cil-library" class="mr-2" /> 5-11) รายละเอียดเนื้อหาโครงการวิจัย
+          </h5>
+        </CCardHeader>
+        <CCardBody class="p-4 bg-white">
+          <div v-for="(field, i) in textFields" :key="'text-' + i"
+            :class="['mb-5 pb-4', i < textFields.length - 1 ? 'border-bottom' : '']">
 
+            <h5 class="font-weight-bold text-dark mb-3">
+              <span class="text-primary mr-2">|</span> {{ field.label }}
+            </h5>
 
-        <CCard v-for="(field, i) in textFields" :key="i" class="shadow-sm mt-4">
-          <CCardHeader>
-            <strong>{{ field.label }}</strong>
-          </CCardHeader>
-          <CCardBody>
-            <quill-editor v-model="form[field.model]" :options="editorOption" style="min-height:" />
-          </CCardBody>
-        </CCard>
+            <div class="border rounded shadow-sm overflow-hidden">
+              <quill-editor v-model="form[field.model]" :options="editorOption" style="min-height: " />
+            </div>
 
-        <CCard class="mt-4 shadow-sm">
-          <CCardHeader><strong>12) แผนการดำเนินงาน</strong></CCardHeader>
-          <CCardBody>
-            <ResearchSection12 />
-          </CCardBody>
-        </CCard>
+          </div>
+        </CCardBody>
+      </CCard>
 
-        <CCard class="mt-4 shadow-sm">
-          <CCardHeader><strong>งบประมาณและมาตรฐานวิจัย</strong></CCardHeader>
-          <CCardBody>
-            <label class="font-weight-bold">13) ผลงานตามระยะเวลาการรายงาน</label>
+      <CCard class="shadow-sm w-100 mb-4 border-0">
+        <CCardHeader class="bg-primary text-white py-3">
+          <h5 class="m-0 font-weight-bold">
+            <CIcon name="cil-calendar" class="mr-2" /> 12) แผนการดำเนินงาน
+          </h5>
+        </CCardHeader>
+        <CCardBody class="p-4 bg-white">
+          <ResearchSection12 />
+        </CCardBody>
+      </CCard>
+
+      <CCard class="shadow-sm w-100 mb-4 border-0">
+        <CCardHeader class="bg-primary text-white py-3">
+          <h5 class="m-0 font-weight-bold">
+            <CIcon name="cil-money" class="mr-2" /> งบประมาณและมาตรฐานวิจัย
+          </h5>
+        </CCardHeader>
+        <CCardBody class="p-4">
+
+          <div class="mb-5">
+            <h5 class="font-weight-bold text-dark">13) ผลงานตามระยะเวลาการรายงาน</h5>
             <quill-editor v-model="form.progressReport" :options="editorOption" class="mb-4" />
 
-
-            <CRow class="mb-4">
-              <CCol md="12">
-                <label class="font-weight-bold">2) ประเภททุน *</label>
-                <div class="d-flex flex-wrap border rounded p-3 bg-light" style="gap: 25px;">
-                  <div v-for="type in budgetTypes" :key="type.value" class="custom-control custom-radio">
-                    <input type="radio" :id="'radio-' + type.value" :value="type.label" v-model="form.budgetType"
-                      class="custom-control-input">
-                    <label class="custom-control-label" :for="'radio-' + type.value">{{ type.label }}</label>
-                  </div>
+            <h5 class="font-weight-bold mb-4 text-dark border-bottom pb-2">14) ผลลัพธ์ที่คาดว่าจะได้รับ
+              (สัมพันธ์กับประเภททุน)</h5>
+            <div v-if="form.budgetType" class="p-4 border rounded bg-light shadow-sm mb-4 border-left-primary">
+              <template v-if="form.budgetType === 'ทุนนักวิจัยรุ่นใหม่'">
+                <h6 class="font-weight-bold text-primary mb-3">14.1 ทุนนักวิจัยรุ่นใหม่</h6>
+                <div v-for="(opt, idx) in outcomes.newResearcher" :key="idx"
+                  class="custom-control custom-checkbox mb-2">
+                  <input type="checkbox" class="custom-control-input" :id="'chk1-' + idx" :value="opt"
+                    v-model="form.selectedOutcomes">
+                  <label class="custom-control-label" :for="'chk1-' + idx">{{ opt }}</label>
                 </div>
-              </CCol>
-            </CRow>
+              </template>
+              <template v-else-if="form.budgetType === 'ทุนพัฒนานักวิจัย'">
+                <h6 class="font-weight-bold text-success mb-3">14.2 ทุนพัฒนานักวิจัย</h6>
+                <div v-for="(opt, idx) in outcomes.devResearcher" :key="idx"
+                  class="custom-control custom-checkbox mb-2">
+                  <input type="checkbox" class="custom-control-input" :id="'chk2-' + idx" :value="opt"
+                    v-model="form.selectedOutcomes">
+                  <label class="custom-control-label" :for="'chk2-' + idx">{{ opt }}</label>
+                </div>
+              </template>
+              <template v-if="form.budgetType === 'ทุนวิจัยที่สอดคล้องกับยุทธศาสตร์'">
+                <h6 class="font-weight-bold text-primary mb-3">14.3 ทุนวิจัยที่สอดคล้องกับยุทธศาสตร์</h6>
+                <div v-for="(opt, idx) in outcomes.strategic" :key="idx" class="custom-control custom-checkbox mb-2">
+                  <input type="checkbox" class="custom-control-input" :id="'chk1-' + idx" :value="opt"
+                    v-model="form.selectedOutcomes">
+                  <label class="custom-control-label" :for="'chk1-' + idx">{{ opt }}</label>
+                </div>
+              </template>
+              <template v-if="form.budgetType === 'ทุนต่อยอดสู่ภาคอุตสาหกรรม'">
+                <h6 class="font-weight-bold text-primary mb-3">14.4 ทุนต่อยอดสู่ภาคอุตสาหกรรม</h6>
+                <div v-for="(opt, idx) in outcomes.industrial" :key="idx" class="custom-control custom-checkbox mb-2">
+                  <input type="checkbox" class="custom-control-input" :id="'chk1-' + idx" :value="opt"
+                    v-model="form.selectedOutcomes">
+                  <label class="custom-control-label" :for="'chk1-' + idx">{{ opt }}</label>
+                </div>
+              </template>
+            </div>
+            <div v-else class="alert alert-warning">กรุณาเลือก "ประเภททุน" ในหัวข้อที่ 2 เพื่อเลือกผลลัพธ์</div>
+          </div>
 
-            <hr class="my-4">
+          <div class="mb-5">
+            <h5 class="font-weight-bold text-dark">15) การบูรณาการงานวิจัย</h5>
+            <quill-editor v-model="form.integration" :options="editorOption" class="mb-4" />
 
-            <CRow>
-              <CCol md="12">
-                <h5 class="font-weight-bold mb-4 text-dark">
-                  14) ผลลัพธ์ที่คาดว่าจะได้รับจากงานวิจัยเมื่อเสร็จสิ้นการวิจัย *
-                </h5>
+            <h5 class="font-weight-bold text-dark mb-3">16) ระดับการถ่ายทอดสู่สังคม *</h5>
+            <div class="bg-light p-4 rounded border mb-5 shadow-sm w-100 border-left-primary">
+              <div class="ml-3">
+                <div v-for="(opt, i) in transferOptions" :key="'trans-' + i" class="custom-control custom-radio mb-3">
+                  <input type="radio" :id="'trans-' + i" :value="opt" v-model="form.transferLevel"
+                    class="custom-control-input">
+                  <label class="custom-control-label text-dark" :for="'trans-' + i" style="cursor: pointer;">
+                    {{ opt }}
+                  </label>
+                </div>
+              </div>
+            </div>
 
-                <div v-if="form.budgetType === 'ทุนนักวิจัยรุ่นใหม่'"
-                  class="outcome-box p-3 border rounded bg-white shadow-sm mb-4">
-                  <h6 class="font-weight-bold text-primary mb-3">14.1 ทุนนักวิจัยรุ่นใหม่</h6>
-                  <div v-for="(item, index) in outcomes.newResearcher" :key="'opt1-' + index"
-                    class="custom-control custom-checkbox mb-2 ml-2">
-                    <input type="checkbox" class="custom-control-input" :id="'chk1-' + index" :value="item"
-                      v-model="form.selectedOutcomes">
-                    <label class="custom-control-label small" :for="'chk1-' + index">{{ item }}</label>
-                  </div>
+            <h5 class="font-weight-bold mb-3 text-dark">17) กรอกรายละเอียดงบประมาณ (พ.ศ. 2569)</h5>
+            <div class="border rounded bg-white shadow-sm overflow-hidden mb-4">
+              <BudgetSection v-model="form.budgets" />
+            </div>
+          </div>
+
+          <CCard class="shadow-sm w-100 mb-4 border-0">
+            <CCardHeader class="bg-primary text-white py-3">
+              <h5 class="m-0 font-weight-bold">
+                <CIcon name="cil-check-circle" class="mr-2" /> 18) มาตรฐานการวิจัย *
+              </h5>
+            </CCardHeader>
+            <CCardBody class="p-4 bg-white">
+              <div class="p-4 border rounded bg-light shadow-sm w-100 border-left-primary">
+
+                <div class="custom-control custom-checkbox mb-4">
+                  <input type="checkbox" class="custom-control-input" id="std_none" value="none"
+                    v-model="form.standards">
+                  <label class="custom-control-label font-weight-bold text-dark" for="std_none"
+                    style="font-size: 16px; cursor: pointer;">
+                    ไม่มีการทำวิจัยในมนุษย์ / ไม่มีการใช้สัตว์ทดลอง /
+                    การวิจัยที่เกี่ยวข้องกับการงานด้านเทคโนโลยีชีวภาพสมัยใหม่
+                  </label>
                 </div>
 
-                <div v-if="form.budgetType === 'ทุนพัฒนานักวิจัย'"
-                  class="outcome-box p-3 border rounded bg-white shadow-sm mb-4">
-                  <h6 class="font-weight-bold text-success mb-3">14.2 ทุนพัฒนานักวิจัย</h6>
-                  <div v-for="(item, index) in outcomes.devResearcher" :key="'opt2-' + index"
-                    class="custom-control custom-checkbox mb-2 ml-2">
-                    <input type="checkbox" class="custom-control-input" :id="'chk2-' + index" :value="item"
-                      v-model="form.selectedOutcomes">
-                    <label class="custom-control-label small" :for="'chk2-' + index">{{ item }}</label>
-                  </div>
+                <hr class="my-4">
+
+                <div class="custom-control custom-checkbox mb-2">
+                  <input type="checkbox" class="custom-control-input" id="std_human" value="human"
+                    v-model="form.standards">
+                  <label class="custom-control-label font-weight-bold text-primary" for="std_human"
+                    style="font-size: 17px; cursor: pointer;">
+                    มีการทำวิจัยในมนุษย์
+                  </label>
                 </div>
 
-                <div v-if="form.budgetType === 'ทุนวิจัยที่สอดคล้องกับยุทธศาสตร์'"
-                  class="outcome-box p-3 border rounded bg-white shadow-sm mb-4">
-                  <h6 class="font-weight-bold text-warning mb-3">14.3 ทุนวิจัยที่สอดคล้องกับยุทธศาสตร์</h6>
-                  <div v-for="(item, index) in outcomes.strategic" :key="'opt3-' + index"
-                    class="custom-control custom-checkbox mb-2 ml-2">
-                    <input type="checkbox" class="custom-control-input" :id="'chk3-' + index" :value="item"
-                      v-model="form.selectedOutcomes">
-                    <label class="custom-control-label small" :for="'chk3-' + index">{{ item }}</label>
-                  </div>
-                </div>
-
-                <div v-if="form.budgetType === 'ทุนต่อยอดสู่ภาคอุตสาหกรรม'"
-                  class="outcome-box p-3 border rounded bg-white shadow-sm mb-4">
-                  <h6 class="font-weight-bold text-info mb-3">14.4 ทุนต่อยอดสู่ภาคอุตสาหกรรม</h6>
-                  <div v-for="(item, index) in outcomes.industrial" :key="'opt4-' + index"
-                    class="custom-control custom-checkbox mb-2 ml-2">
-                    <input type="checkbox" class="custom-control-input" :id="'chk4-' + index" :value="item"
-                      v-model="form.selectedOutcomes">
-                    <label class="custom-control-label small" :for="'chk4-' + index">{{ item }}</label>
-                  </div>
-                </div>
-              </CCol>
-            </CRow>
-
-
-            <label class="font-weight-bold">15) การบูรณาการงานวิจัย</label>
-            <quill-editor v-model="form.IntegrationResearch" :options="editorOption" class="mb-4" />
-
-            <CRow>
-              <CCol md="6">
-                <label class="font-weight-bold">16) ระดับการถ่ายทอดสู่สังคม</label>
-                <CInputRadioGroup
-                  :options="['สามารถนำไปถ่ายทอดเป็นต้นแบบและแนวทางได้ในระดับภูมิภาค ประเทศ หรือนานาชาติ', 'สามารถนำไปถ่ายทอดเป็นต้นแบบและแนวทางได้เฉพาะกลุ่มอาชีพ ชุมชน หรือจังหวัด', 'ไม่มีการนำไปถ่ายทอดสู่สังคม']"
-                  :checked.sync="form.transferLevel" />
-              </CCol>
-            </CRow>
-            <CCard class="mt-4 shadow-sm">
-              <CCardHeader><strong>17) กรอกงบประมาณ</strong></CCardHeader>
-              <CCardBody>
-                <BudgetSection v-model="form.budgets" />
-              </CCardBody>
-            </CCard>
-
-
-            <CRow class="mb-5">
-              <CCol md="12">
-                <h5 class="font-weight-bold mb-4">18) มาตรฐานการวิจัย <span class="text-danger">*</span></h5>
-
-                <div class="standard-container p-3 border rounded bg-white shadow-sm">
-
+                <div v-if="form.standards.includes('human')"
+                  class="ml-5 mb-5 p-4 border-left bg-white rounded shadow-sm">
                   <div class="custom-control custom-checkbox mb-3">
-                    <input type="checkbox" class="custom-control-input" id="std_none" value="none"
-                      v-model="form.standards">
-                    <label class="custom-control-label" for="std_none">
-                      ไม่มีการทำวิจัยในมนุษย์ / ไม่มีการใช้สัตว์ทดลอง /
-                      การวิจัยที่เกี่ยวข้องกับการงานด้านเทคโนโลยีชีวภาพสมัยใหม่
+                    <input type="checkbox" class="custom-control-input" id="h_cert" v-model="form.humanDetail.hasCert">
+                    <label class="custom-control-label text-dark" for="h_cert"
+                      style="font-size: 16px; cursor: pointer;">
+                      มีหนังสือรับรองจริยธรรมการวิจัยในมนุษย์ (แนบสำเนา 1 ชุด)
                     </label>
                   </div>
 
-                  <div class="custom-control custom-checkbox mb-2">
-                    <input type="checkbox" class="custom-control-input" id="std_human" value="human"
-                      v-model="form.standards">
-                    <label class="custom-control-label" for="std_human">มีการทำวิจัยในมนุษย์</label>
+                  <div class="custom-control custom-checkbox mb-3">
+                    <input type="checkbox" class="custom-control-input" id="h_pending"
+                      v-model="form.humanDetail.isPending">
+                    <label class="custom-control-label text-dark" for="h_pending"
+                      style="font-size: 16px; line-height: 1.5; cursor: pointer;">
+                      ไม่มีหนังสือรับรองจริยธรรมการวิจัยในมนุษย์
+                      อยู่ระหว่างเสนอคณะกรรมการจริยธรรมการวิจัยในมนุษย์พิจารณา
+                    </label>
                   </div>
 
-                  <div v-if="form.standards.includes('human')" class="ml-5 mb-4 p-2 border-left">
-                    <div class="custom-control custom-checkbox mb-2">
-                      <input type="checkbox" class="custom-control-input" id="human_cert"
-                        v-model="form.humanDetail.hasCert">
-                      <label class="custom-control-label small" for="human_cert">มีหนังสือรับรองจริยธรรมการวิจัยในมนุษย์
-                        (แนบสำเนา 1 ชุด)</label>
-                    </div>
-
-                    <div class="custom-control custom-checkbox mb-2">
-                      <input type="checkbox" class="custom-control-input" id="human_pending"
-                        v-model="form.humanDetail.isPending">
-                      <label class="custom-control-label small" for="human_pending">
-                        ไม่มีหนังสือรับรองจริยธรรมการวิจัยในมนุษย์
-                        อยู่ระหว่างเสนอคณะกรรมการจริยธรรมการวิจัยในมนุษย์พิจารณา
-                      </label>
-                    </div>
-
-                    <div v-if="form.humanDetail.isPending" class="d-flex align-items-center mt-2 ml-4 flex-wrap"
-                      style="gap: 10px;">
-                      <span class="small">วันที่ยื่นโครงการ</span>
-                      <CInput type="date" v-model="form.humanDetail.applyDate" size="sm" class="mb-0"
-                        style="width: 150px;" />
-                      <div class="custom-file-upload border p-1 rounded bg-light d-flex align-items-center">
-                        <input type="file" @change="handleFileUpload($event, 'human')" class="small">
-                      </div>
+                  <div v-if="form.humanDetail.isPending"
+                    class="d-flex align-items-center mt-3 ml-4 flex-wrap bg-light p-3 rounded border"
+                    style="gap: 20px;">
+                    <span class="font-weight-bold text-dark" style="font-size: 15px;">วันที่ยื่นโครงการ:</span>
+                    <input type="date" v-model="form.humanDetail.applyDate" class="form-control form-control-sm"
+                      style="width: 180px; height: 35px;">
+                    <div class="custom-file-upload">
+                      <input type="file" @change="handleFileUpload($event, 'human')"
+                        class="form-control-file border p-1 rounded bg-white">
                     </div>
                   </div>
-
-                  <div class="custom-control custom-checkbox mb-2">
-                    <input type="checkbox" class="custom-control-input" id="std_animal" value="animal"
-                      v-model="form.standards">
-                    <label class="custom-control-label" for="std_animal">มีการใช้สัตว์ทดลอง</label>
-                  </div>
-
-                  <div v-if="form.standards.includes('animal')" class="ml-5 p-2 border-left">
-                    <div class="custom-control custom-checkbox mb-2">
-                      <input type="checkbox" class="custom-control-input" id="animal_cert"
-                        v-model="form.animalDetail.hasCert">
-                      <label class="custom-control-label small"
-                        for="animal_cert">มีหนังสือรับรองจรรยาบรรณสัตว์เพื่องานทางวิทยาศาสตร์ (แนบสำเนา 1 ชุด)</label>
-                    </div>
-
-                    <div class="custom-control custom-checkbox mb-2">
-                      <input type="checkbox" class="custom-control-input" id="animal_pending"
-                        v-model="form.animalDetail.isPending">
-                      <label class="custom-control-label small" for="animal_pending">
-                        ไม่มีหนังสือรับรองจรรยาบรรณสัตว์เพื่องานทางวิทยาศาสตร์
-                        อยู่ระหว่างเสนอคณะกรรมการจรรยาบรรณสัตว์เพื่องานทางวิทยาศาสตร์
-                      </label>
-                    </div>
-
-                    <div v-if="form.animalDetail.isPending" class="d-flex align-items-center mt-2 ml-4 flex-wrap"
-                      style="gap: 10px;">
-                      <span class="small">วันที่ยื่นโครงการ</span>
-                      <CInput type="date" v-model="form.animalDetail.applyDate" size="sm" class="mb-0"
-                        style="width: 150px;" />
-                      <div class="custom-file-upload border p-1 rounded bg-light d-flex align-items-center">
-                        <input type="file" @change="handleFileUpload($event, 'animal')" class="small">
-                      </div>
-                    </div>
-                  </div>
-
                 </div>
-              </CCol>
-            </CRow>
 
+                <div class="custom-control custom-checkbox mb-2">
+                  <input type="checkbox" class="custom-control-input" id="std_animal" value="animal"
+                    v-model="form.standards">
+                  <label class="custom-control-label font-weight-bold text-primary" for="std_animal"
+                    style="font-size: 17px; cursor: pointer;">
+                    มีการใช้สัตว์ทดลอง
+                  </label>
+                </div>
 
-            <label class="font-weight-bold">19) หมายเหตุ</label>
-            <quill-editor v-model="form.Note" :options="editorOption" class="mb-4" />
+                <div v-if="form.standards.includes('animal')" class="ml-5 p-4 border-left bg-white rounded shadow-sm">
+                  <div class="custom-control custom-checkbox mb-3">
+                    <input type="checkbox" class="custom-control-input" id="animal_cert"
+                      v-model="form.animalDetail.hasCert">
+                    <label class="custom-control-label text-dark" for="animal_cert"
+                      style="font-size: 16px; cursor: pointer;">
+                      มีหนังสือรับรองจรรยาบรรณสัตว์เพื่องานทางวิทยาศาสตร์ (แนบสำเนา 1 ชุด)
+                    </label>
+                  </div>
 
-          </CCardBody>
-          <CCardFooter class="d-flex justify-content-end">
-            <CButton color="primary" @click="submit" class="mr-2">บันทึกข้อมูล</CButton>
-            <CButton color="info" @click="exportPDF">Export PDF</CButton>
-          </CCardFooter>
-        </CCard>
-      </CCol>
-    </CRow>
+                  <div class="custom-control custom-checkbox mb-3">
+                    <input type="checkbox" class="custom-control-input" id="animal_pending"
+                      v-model="form.animalDetail.isPending">
+                    <label class="custom-control-label text-dark" for="animal_pending"
+                      style="font-size: 16px; line-height: 1.5; cursor: pointer;">
+                      ไม่มีหนังสือรับรองจรรยาบรรณสัตว์ฯ
+                      อยู่ระหว่างเสนอคณะกรรมการจรรยาบรรณสัตว์เพื่องานทางวิทยาศาสตร์พิจารณา
+                    </label>
+                  </div>
+
+                  <div v-if="form.animalDetail.isPending"
+                    class="d-flex align-items-center mt-3 ml-4 flex-wrap bg-light p-3 rounded border"
+                    style="gap: 20px;">
+                    <span class="font-weight-bold text-dark" style="font-size: 15px;">วันที่ยื่นโครงการ:</span>
+                    <input type="date" v-model="form.animalDetail.applyDate" class="form-control form-control-sm"
+                      style="width: 180px; height: 35px;">
+                    <div class="custom-file-upload">
+                      <input type="file" @change="handleFileUpload($event, 'animal')"
+                        class="form-control-file border p-1 rounded bg-white">
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </CCardBody>
+          </CCard>
+
+          <h5 class="font-weight-bold text-dark">19) หมายเหตุ</h5>
+          <quill-editor v-model="form.remark" :options="editorOption" class="mb-4" />
+
+        </CCardBody>
+
+        <CCardFooter class="bg-white p-4 border-top d-flex justify-content-end shadow-sm" style="gap: 15px;">
+          <CButton color="danger" variant="outline" class="px-5 font-weight-bold" @click="resetForm">ล้างข้อมูล
+          </CButton>
+          <CButton color="primary" class="px-5 font-weight-bold shadow" @click="submit">
+            <CIcon name="cil-save" class="mr-2" /> บันทึกแบบเสนอโครงการ
+          </CButton>
+          <CButton color="info" class="px-4 font-weight-bold" @click="exportPDF">
+            <CIcon name="cil-print" class="mr-2" /> Export PDF
+          </CButton>
+        </CCardFooter>
+      </CCard>
+    </div>
   </div>
 </template>
 
@@ -457,12 +464,17 @@ export default {
         { label: "10) วิธีดำเนินการวิจัย", model: "methodology" },
         { label: "11) ขอบเขตการวิจัย", model: "scope" }
       ],
+      transferOptions: [
+        "สามารถนำไปถ่ายทอดเป็นต้นแบบและแนวทางได้ในระดับภูมิภาค ประเทศ หรือนานาชาติ",
+        "สามารถนำไปถ่ายทอดเป็นต้นแบบและแนวทางได้เฉพาะกลุ่มอาชีพ ชุมชน หรือจังหวัด",
+        "ไม่มีการนำไปถ่ายทอดสู่สังคม"
+      ],
       form: {
         titleTH: "", titleEN: "", budgetType: "", budgets: [],
         cooperation: "ไม่มี", cooperationDetail: "", researchType: "",
         keywords: "", importance: "", objective: "", literature: "",
         reference: "", methodology: "", scope: "", progressReport: "",
-        expectedResults: [], integration: "", transferLevel: "ไม่มี",
+        expectedResults: [], integration: "", transferLevel: "ไม่มีการนำไปถ่ายทอดสู่สังคม",
         ethics: { human: false, animal: false }, remark: "",
         selectedOutcomes: [], standards: [], // เก็บค่า 'none', 'human', 'animal'
         humanDetail: {
@@ -481,7 +493,7 @@ export default {
           mainResearcher: { name: "", affiliation: "", phone: "", email: "", code: "" },
           coResearchers: [],
           advisors: []
-        }
+        },
       },
 
     };
@@ -543,21 +555,47 @@ export default {
 </script>
 
 <style scoped>
-/* ปรับแต่งความสวยงามของ Editor ให้เข้ากับ CoreUI */
+/* เน้นขอบซ้ายของกล่องคอนเทนเนอร์หลัก */
+.border-left-primary {
+  border-left: 6px solid #321fdb !important;
+}
+
+.ml-5 {
+  margin-left: 3.5rem !important;
+}
+
+/* เส้นประคั่นลำดับชั้นตามภาพ image_b78bdd.png */
+.border-left {
+  border-left: 3px dashed #321fdb !important;
+  transition: all 0.3s ease;
+}
+
+/* ปรับแต่งปุ่มเลือกไฟล์ให้ดูสะอาดตา */
+.custom-file-upload input[type="file"] {
+  font-size: 13px;
+  cursor: pointer;
+}
+
 .quill-editor {
   background-color: white;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
 }
 
-.ql-toolbar.ql-snow {
-  border: 1px solid #ebedef;
-  background-color: #f8f9fa;
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
+/* ปรับแต่งความกว้าง Inputs ให้ดูเต็มแต่ไม่ล้น */
+.form-group {
+  margin-bottom: 1.5rem;
 }
 
-.ql-container.ql-snow {
-  border: 1px solid #ebedef;
-  border-bottom-left-radius: 4px;
-  border-bottom-right-radius: 4px;
+.custom-control-label {
+  cursor: pointer;
+}
+
+/* Footer Shadow */
+.card-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  border-top: 1px solid #ebedef;
 }
 </style>
