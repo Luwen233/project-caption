@@ -49,7 +49,7 @@
                 </tr>
                 <tr v-for="(r, ri) in cat.rows" :key="ri">
                   <td class="px-3 py-2">
-                    <div v-if="!r.isManual && !r.fileUrl" class="font-weight-bold text-dark small">{{ r.name }}</div>
+                    <div v-if="!r.isManual && !r.fileUrl" class="font-weight-bold text-dark">{{ r.name }}</div>
                     <CInput v-else v-model="r.name" size="sm" class="mb-0" placeholder="ระบุชื่อรายการ..." />
                     
                     <div v-if="r.fileUrl" class="mt-2 d-flex align-items-center flex-wrap" style="gap: 6px;">
