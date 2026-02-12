@@ -36,7 +36,217 @@
             </CRow>
           </CCardBody>
         </CCard>
+          
+        <!-- ส่วนที่เพิ่มใหม่: ก) สาระสำคัญของข้อเสนอโครงการวิจัย — คณะผู้วิจัย -->
+        <CCard class="mt-4 shadow-sm">
+          <CCardHeader>
+            <strong>ส่วน ก) : สาระสำคัญของข้อเสนอโครงการวิจัย — คณะผู้วิจัย</strong>
+          </CCardHeader>
+          <CCardBody>
+            <!-- 1) คณะผู้วิจัย -->
+            <div class="mb-4">
+              <h6 class="font-weight-bold mb-3">1) คณะผู้วิจัย</h6>
+              
+              <!-- 1.1 หัวหน้าโครงการวิจัย -->
+              <div class="border rounded p-3 mb-3 bg-light">
+                <h6 class="font-weight-bold text-primary mb-3">1.1 หัวหน้าโครงการวิจัย</h6>
+                <CRow>
+                  <CCol md="4">
+                    <CInput 
+                      label="ชื่อ-สกุล *" 
+                      v-model="form.researchers.mainResearcher.name" 
+                      placeholder="กรอกชื่อ-นามสกุล"
+                    />
+                  </CCol>
+                  <CCol md="4">
+                    <CInput 
+                      label="สังกัดหน่วยงาน *" 
+                      v-model="form.researchers.mainResearcher.affiliation" 
+                      placeholder="เช่น วิทยาลัยการเกษตรและเทคโนโลยี"
+                    />
+                  </CCol>
+                  <CCol md="4">
+                    <CInput 
+                      label="เบอร์โทรศัพท์ *" 
+                      v-model="form.researchers.mainResearcher.phone" 
+                      placeholder="0xx-xxxxxxx"
+                    />
+                  </CCol>
+                  <CCol md="6">
+                    <CInput 
+                      label="E-mail address *" 
+                      v-model="form.researchers.mainResearcher.email" 
+                      placeholder="name@mfu.ac.th"
+                      type="email"
+                    />
+                  </CCol>
+                  <CCol md="6">
+                    <CInput 
+                      label="ผลเป็นเลขสังกัดหรือรับรองตละ *" 
+                      v-model="form.researchers.mainResearcher.code" 
+                      placeholder="เช่น 80"
+                    />
+                  </CCol>
+                </CRow>
+              </div>
 
+              <!-- 1.2 ผู้ร่วมโครงการวิจัย (เพิ่มได้หลายคน) -->
+              <div class="border rounded p-3 mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h6 class="font-weight-bold text-success mb-0">1.2 ผู้ร่วมโครงการวิจัย (เพิ่มได้หลายคน)</h6>
+                  <CButton color="primary" size="sm" @click="addCoResearcher">
+                    + เพิ่มผู้ร่วมโครงการ
+                  </CButton>
+                </div>
+
+                <div 
+                  v-for="(researcher, index) in form.researchers.coResearchers" 
+                  :key="'co-' + index"
+                  class="border rounded p-3 mb-3 bg-white position-relative"
+                >
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <strong>ผู้ร่วมโครงการ #{{ index + 1 }}</strong>
+                    <CButton 
+                      color="danger" 
+                      size="sm" 
+                      @click="removeCoResearcher(index)"
+                    >
+                      ลบ
+                    </CButton>
+                  </div>
+                  <CRow>
+                    <CCol md="4">
+                      <CInput 
+                        label="ชื่อ-สกุล *" 
+                        v-model="researcher.name" 
+                        placeholder="กรอกชื่อ"
+                      />
+                    </CCol>
+                    <CCol md="4">
+                      <CInput 
+                        label="สังกัดหน่วยงาน *" 
+                        v-model="researcher.affiliation" 
+                        placeholder="เช่น วิทยาลัยการเกษตรและเทคโนโลยี"
+                      />
+                    </CCol>
+                    <CCol md="4">
+                      <CInput 
+                        label="เบอร์โทรศัพท์ *" 
+                        v-model="researcher.phone" 
+                        placeholder="0xx-xxxxxxx"
+                      />
+                    </CCol>
+                    <CCol md="6">
+                      <CInput 
+                        label="E-mail address *" 
+                        v-model="researcher.email" 
+                        placeholder="name@mfu.ac.th"
+                        type="email"
+                      />
+                    </CCol>
+                    <CCol md="6">
+                      <CInput 
+                        label="ผลเป็นเลขสังกัดหรือรับรองตละ *" 
+                        v-model="researcher.code" 
+                        placeholder="เช่น 80"
+                      />
+                    </CCol>
+                  </CRow>
+                </div>
+
+                <div v-if="form.researchers.coResearchers.length === 0" class="text-center text-muted py-3">
+                  <em>ยังไม่มีผู้ร่วมโครงการ กดปุ่ม "+ เพิ่มผู้ร่วมโครงการ" เพื่อเพิ่ม</em>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2) ที่ปรึกษาโครงการวิจัย (เพิ่มได้หลายคน) -->
+            <div class="mb-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="font-weight-bold text-info mb-0">2) ที่ปรึกษาโครงการวิจัย (เพิ่มได้หลายคน)</h6>
+                <CButton color="info" size="sm" @click="addAdvisor">
+                  + เพิ่มที่ปรึกษาโครงการ
+                </CButton>
+              </div>
+
+              <div 
+                v-for="(advisor, index) in form.researchers.advisors" 
+                :key="'advisor-' + index"
+                class="border rounded p-3 mb-3 bg-light position-relative"
+              >
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <strong>{{ index + 1 }}.{{ index + 1 }} ที่ปรึกษาโครงการวิจัย</strong>
+                  <CButton 
+                    color="danger" 
+                    size="sm" 
+                    @click="removeAdvisor(index)"
+                  >
+                    ลบ
+                  </CButton>
+                </div>
+                <CRow>
+                  <CCol md="4">
+                    <CInput 
+                      label="ชื่อ-สกุล *" 
+                      v-model="advisor.name" 
+                      placeholder="กรอกชื่อ-นามสกุล"
+                    />
+                  </CCol>
+                  <CCol md="4">
+                    <CInput 
+                      label="สังกัดหน่วยงาน *" 
+                      v-model="advisor.affiliation" 
+                      placeholder="เช่น วิทยาลัยการเกษตรและเทคโนโลยี"
+                    />
+                  </CCol>
+                  <CCol md="4">
+                    <CInput 
+                      label="เบอร์โทรศัพท์ *" 
+                      v-model="advisor.phone" 
+                      placeholder="0xx-xxxxxxx"
+                    />
+                  </CCol>
+                  <CCol md="12">
+                    <CInput 
+                      label="E-mail address *" 
+                      v-model="advisor.email" 
+                      placeholder="name@mfu.ac.th"
+                      type="email"
+                    />
+                  </CCol>
+                </CRow>
+              </div>
+
+              <div v-if="form.researchers.advisors.length === 0" class="text-center text-muted py-3 border rounded">
+                <em>ยังไม่มีที่ปรึกษาโครงการ กดปุ่ม "+ เพิ่มที่ปรึกษาโครงการ" เพื่อเพิ่ม</em>
+              </div>
+            </div>
+
+            <!-- 3) ความร่วมมือด้านการวิจัยกับหน่วยงานเกายนอก -->
+            <div class="mb-4">
+              <h6 class="font-weight-bold mb-3">3) ความร่วมมือด้านการวิจัยกับหน่วยงานเกายนอก</h6>
+              <div class="border rounded p-3 bg-light">
+                <CRow>
+                  <CCol md="6">
+                    <CSelect 
+                      label="มีความร่วมมือหรือไม่" 
+                      :options="['ไม่มี', 'มี']" 
+                      :value.sync="form.researchers.externalCollaboration.hasCollaboration" 
+                    />
+                  </CCol>
+                  <CCol md="12" v-if="form.researchers.externalCollaboration.hasCollaboration === 'มี'">
+                    <CInput 
+                      label="รายละเอียดหน่วยงาน/ลูปความร่วมมือ" 
+                      v-model="form.researchers.externalCollaboration.details" 
+                      placeholder="เช่น การวิจัยและบริการวิชาการระบบเพื่อพันธุ์ความร่วมยอนากการเเแข่งขัน"
+                    />
+                  </CCol>
+                </CRow>
+              </div>
+            </div>
+          </CCardBody>
+        </CCard>
+        <!-- จบส่วนที่เพิ่มใหม่ -->
         <CCard v-for="(field, i) in textFields" :key="i" class="shadow-sm mt-4">
           <CCardHeader>
             <strong>{{ field.label }}</strong>
@@ -52,6 +262,217 @@
             <ResearchSection12 />
           </CCardBody>
         </CCard>
+
+        <!-- ส่วนที่เพิ่มใหม่: ก) สาระสำคัญของข้อเสนอโครงการวิจัย — คณะผู้วิจัย -->
+        <CCard class="mt-4 shadow-sm">
+          <CCardHeader>
+            <strong>ส่วน ก) : สาระสำคัญของข้อเสนอโครงการวิจัย — คณะผู้วิจัย</strong>
+          </CCardHeader>
+          <CCardBody>
+            <!-- 1) คณะผู้วิจัย -->
+            <div class="mb-4">
+              <h6 class="font-weight-bold mb-3">1) คณะผู้วิจัย</h6>
+              
+              <!-- 1.1 หัวหน้าโครงการวิจัย -->
+              <div class="border rounded p-3 mb-3 bg-light">
+                <h6 class="font-weight-bold text-primary mb-3">1.1 หัวหน้าโครงการวิจัย</h6>
+                <CRow>
+                  <CCol md="4">
+                    <CInput 
+                      label="ชื่อ-สกุล *" 
+                      v-model="form.researchers.mainResearcher.name" 
+                      placeholder="กรอกชื่อ-นามสกุล"
+                    />
+                  </CCol>
+                  <CCol md="4">
+                    <CInput 
+                      label="สังกัดหน่วยงาน *" 
+                      v-model="form.researchers.mainResearcher.affiliation" 
+                      placeholder="เช่น วิทยาลัยการเกษตรและเทคโนโลยี"
+                    />
+                  </CCol>
+                  <CCol md="4">
+                    <CInput 
+                      label="เบอร์โทรศัพท์ *" 
+                      v-model="form.researchers.mainResearcher.phone" 
+                      placeholder="0xx-xxxxxxx"
+                    />
+                  </CCol>
+                  <CCol md="6">
+                    <CInput 
+                      label="E-mail address *" 
+                      v-model="form.researchers.mainResearcher.email" 
+                      placeholder="name@mfu.ac.th"
+                      type="email"
+                    />
+                  </CCol>
+                  <CCol md="6">
+                    <CInput 
+                      label="ผลเป็นเลขสังกัดหรือรับรองตละ *" 
+                      v-model="form.researchers.mainResearcher.code" 
+                      placeholder="เช่น 80"
+                    />
+                  </CCol>
+                </CRow>
+              </div>
+
+              <!-- 1.2 ผู้ร่วมโครงการวิจัย (เพิ่มได้หลายคน) -->
+              <div class="border rounded p-3 mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h6 class="font-weight-bold text-success mb-0">1.2 ผู้ร่วมโครงการวิจัย (เพิ่มได้หลายคน)</h6>
+                  <CButton color="primary" size="sm" @click="addCoResearcher">
+                    + เพิ่มผู้ร่วมโครงการ
+                  </CButton>
+                </div>
+
+                <div 
+                  v-for="(researcher, index) in form.researchers.coResearchers" 
+                  :key="'co-' + index"
+                  class="border rounded p-3 mb-3 bg-white position-relative"
+                >
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <strong>ผู้ร่วมโครงการ #{{ index + 1 }}</strong>
+                    <CButton 
+                      color="danger" 
+                      size="sm" 
+                      @click="removeCoResearcher(index)"
+                    >
+                      ลบ
+                    </CButton>
+                  </div>
+                  <CRow>
+                    <CCol md="4">
+                      <CInput 
+                        label="ชื่อ-สกุล *" 
+                        v-model="researcher.name" 
+                        placeholder="กรอกชื่อ"
+                      />
+                    </CCol>
+                    <CCol md="4">
+                      <CInput 
+                        label="สังกัดหน่วยงาน *" 
+                        v-model="researcher.affiliation" 
+                        placeholder="เช่น วิทยาลัยการเกษตรและเทคโนโลยี"
+                      />
+                    </CCol>
+                    <CCol md="4">
+                      <CInput 
+                        label="เบอร์โทรศัพท์ *" 
+                        v-model="researcher.phone" 
+                        placeholder="0xx-xxxxxxx"
+                      />
+                    </CCol>
+                    <CCol md="6">
+                      <CInput 
+                        label="E-mail address *" 
+                        v-model="researcher.email" 
+                        placeholder="name@mfu.ac.th"
+                        type="email"
+                      />
+                    </CCol>
+                    <CCol md="6">
+                      <CInput 
+                        label="ผลเป็นเลขสังกัดหรือรับรองตละ *" 
+                        v-model="researcher.code" 
+                        placeholder="เช่น 80"
+                      />
+                    </CCol>
+                  </CRow>
+                </div>
+
+                <div v-if="form.researchers.coResearchers.length === 0" class="text-center text-muted py-3">
+                  <em>ยังไม่มีผู้ร่วมโครงการ กดปุ่ม "+ เพิ่มผู้ร่วมโครงการ" เพื่อเพิ่ม</em>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2) ที่ปรึกษาโครงการวิจัย (เพิ่มได้หลายคน) -->
+            <div class="mb-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="font-weight-bold text-info mb-0">2) ที่ปรึกษาโครงการวิจัย (เพิ่มได้หลายคน)</h6>
+                <CButton color="info" size="sm" @click="addAdvisor">
+                  + เพิ่มที่ปรึกษาโครงการ
+                </CButton>
+              </div>
+
+              <div 
+                v-for="(advisor, index) in form.researchers.advisors" 
+                :key="'advisor-' + index"
+                class="border rounded p-3 mb-3 bg-light position-relative"
+              >
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <strong>{{ index + 1 }}.{{ index + 1 }} ที่ปรึกษาโครงการวิจัย</strong>
+                  <CButton 
+                    color="danger" 
+                    size="sm" 
+                    @click="removeAdvisor(index)"
+                  >
+                    ลบ
+                  </CButton>
+                </div>
+                <CRow>
+                  <CCol md="4">
+                    <CInput 
+                      label="ชื่อ-สกุล *" 
+                      v-model="advisor.name" 
+                      placeholder="กรอกชื่อ-นามสกุล"
+                    />
+                  </CCol>
+                  <CCol md="4">
+                    <CInput 
+                      label="สังกัดหน่วยงาน *" 
+                      v-model="advisor.affiliation" 
+                      placeholder="เช่น วิทยาลัยการเกษตรและเทคโนโลยี"
+                    />
+                  </CCol>
+                  <CCol md="4">
+                    <CInput 
+                      label="เบอร์โทรศัพท์ *" 
+                      v-model="advisor.phone" 
+                      placeholder="0xx-xxxxxxx"
+                    />
+                  </CCol>
+                  <CCol md="12">
+                    <CInput 
+                      label="E-mail address *" 
+                      v-model="advisor.email" 
+                      placeholder="name@mfu.ac.th"
+                      type="email"
+                    />
+                  </CCol>
+                </CRow>
+              </div>
+
+              <div v-if="form.researchers.advisors.length === 0" class="text-center text-muted py-3 border rounded">
+                <em>ยังไม่มีที่ปรึกษาโครงการ กดปุ่ม "+ เพิ่มที่ปรึกษาโครงการ" เพื่อเพิ่ม</em>
+              </div>
+            </div>
+
+            <!-- 3) ความร่วมมือด้านการวิจัยกับหน่วยงานเกายนอก -->
+            <div class="mb-4">
+              <h6 class="font-weight-bold mb-3">3) ความร่วมมือด้านการวิจัยกับหน่วยงานเกายนอก</h6>
+              <div class="border rounded p-3 bg-light">
+                <CRow>
+                  <CCol md="6">
+                    <CSelect 
+                      label="มีความร่วมมือหรือไม่" 
+                      :options="['ไม่มี', 'มี']" 
+                      :value.sync="form.researchers.externalCollaboration.hasCollaboration" 
+                    />
+                  </CCol>
+                  <CCol md="12" v-if="form.researchers.externalCollaboration.hasCollaboration === 'มี'">
+                    <CInput 
+                      label="รายละเอียดหน่วยงาน/ลูปความร่วมมือ" 
+                      v-model="form.researchers.externalCollaboration.details" 
+                      placeholder="เช่น การวิจัยและบริการวิชาการระบบเพื่อพันธุ์ความร่วมยอนากการเเแข่งขัน"
+                    />
+                  </CCol>
+                </CRow>
+              </div>
+            </div>
+          </CCardBody>
+        </CCard>
+        <!-- จบส่วนที่เพิ่มใหม่ -->
 
         <CCard class="mt-4 shadow-sm">
           <CCardHeader><strong>งบประมาณและมาตรฐานวิจัย</strong></CCardHeader>
@@ -322,24 +743,47 @@ export default {
         { label: "11) ขอบเขตการวิจัย", model: "scope" }
       ],
       form: {
-        titleTH: "", titleEN: "", budgetType: "", budgets: [],
-        cooperation: "ไม่มี", cooperationDetail: "", researchType: "",
-        keywords: "", importance: "", objective: "", literature: "",
-        reference: "", methodology: "", scope: "", progressReport: "",
-        expectedResults: [], integration: "", transferLevel: "ไม่มี",
-        ethics: { human: false, animal: false }, remark: "",
-        selectedOutcomes: [], standards: [], // เก็บค่า 'none', 'human', 'animal'
-        humanDetail: {
-          hasCert: false,
-          isPending: false,
-          applyDate: '',
-          file: null
-        },
-        animalDetail: {
-          hasCert: false,
-          isPending: false,
-          applyDate: '',
-          file: null
+        titleTH: "", 
+        titleEN: "", 
+        budgetType: "", 
+        budgets: [],
+        cooperation: "ไม่มี", 
+        cooperationDetail: "", 
+        researchType: "",
+        keywords: "", 
+        importance: "", 
+        objective: "", 
+        literature: "",
+        reference: "", 
+        methodology: "", 
+        scope: "", 
+        progressReport: "",
+        expectedResults: [], 
+        integration: "", 
+        transferLevel: "ไม่มี",
+        ethics: { human: false, animal: false }, 
+        remark: "",
+        selectedOutcomes: [], // สำหรับเก็บผลลัพธ์ที่ user ติ๊กเลือก
+        
+        // เพิ่มส่วนข้อมูลนักวิจัย
+        researchers: {
+          // 1.1 หัวหน้าโครงการวิจัย
+          mainResearcher: {
+            name: "",
+            affiliation: "",
+            phone: "",
+            email: "",
+            code: ""
+          },
+          // 1.2 ผู้ร่วมโครงการวิจัย (array เพราะเพิ่มได้หลายคน)
+          coResearchers: [],
+          // 2) ที่ปรึกษาโครงการวิจัย (array เพราะเพิ่มได้หลายคน)
+          advisors: [],
+          // 3) ความร่วมมือด้านการวิจัยกับหน่วยงานภายนอก
+          externalCollaboration: {
+            hasCollaboration: "ไม่มี",
+            details: ""
+          }
         }
       },
 
@@ -347,13 +791,47 @@ export default {
   },
   watch: {
     // เมื่อเปลี่ยนประเภททุน ให้ล้างค่าที่เคยเลือกไว้ในข้อ 14 เพื่อป้องกันข้อมูลปนกัน
-    'form.budgetType': function () {
+    'form.budgetType': function() {
       this.form.selectedOutcomes = [];
-    },
-
+    }
   },
   methods: {
-    submit() { console.log(this.form); alert("บันทึกสำเร็จ"); },
+    // เพิ่มผู้ร่วมโครงการวิจัย
+    addCoResearcher() {
+      this.form.researchers.coResearchers.push({
+        name: "",
+        affiliation: "",
+        phone: "",
+        email: "",
+        code: ""
+      });
+    },
+    
+    // ลบผู้ร่วมโครงการวิจัย
+    removeCoResearcher(index) {
+      this.form.researchers.coResearchers.splice(index, 1);
+    },
+    
+    // เพิ่มที่ปรึกษาโครงการ
+    addAdvisor() {
+      this.form.researchers.advisors.push({
+        name: "",
+        affiliation: "",
+        phone: "",
+        email: ""
+      });
+    },
+    
+    // ลบที่ปรึกษาโครงการ
+    removeAdvisor(index) {
+      this.form.researchers.advisors.splice(index, 1);
+    },
+    
+    submit() { 
+      console.log(this.form); 
+      alert("บันทึกสำเร็จ"); 
+    },
+    
     exportPDF() {
       const element = document.body;
       html2pdf().from(element).save("Research_Form.pdf");
