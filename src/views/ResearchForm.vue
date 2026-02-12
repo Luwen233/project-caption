@@ -370,9 +370,95 @@
               </CCol>
             </CRow>
 
-
+            
             <label class="font-weight-bold">19) หมายเหตุ</label>
             <quill-editor v-model="form.Note" :options="editorOption" class="mb-4" />
+
+            <CRow class="mt-4">
+              <div class="container-fluid p-4">
+                <div class="card ql-container shadow-sm">
+                  <div class="card-body">
+                    <!-- Header -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                      <div>
+                        <h5 class="mb-1 font-weight-bold">อัปโหลดเอกสาร</h5>
+                        <div class="small-text">
+                          เลือกประเภทเอกสารก่อน แล้วอัปโหลดไฟล์จาก หรือกด Browse
+                        </div>
+                      </div>
+
+                      <button type="button" class="btn btn-outline-secondary upload-btn"
+                        @click="$refs.fileInput.click()">
+                        <i class="fas fa-upload mr-1"></i>
+                        อัปโหลดไฟล์
+                      </button>
+                      <input type="file" ref="fileInput" multiple style="display: none" @change="handleFileUpload2" />
+                    </div>
+
+                    <!-- Table -->
+                    <div class="table-responsive">
+                      <table class="table table-bordered align-middle">
+                        <thead>
+                          <tr>
+                            <th style="width:20%">ประเภท</th>
+                            <th style="width:25%">ชื่อไฟล์</th>
+                            <th style="width:15%">วัน-เวลา</th>
+                            <th style="width:25%">หมายเหตุ</th>
+                            <th style="width:15%">Action</th>
+                          </tr>
+                        </thead>
+
+                        <tbody>
+                          <tr v-for="(item, index) in files" :key="index">
+                            <td style="width:20%">
+                              <select v-model="item.type" class="form-control form-control-sm">
+                                <option disabled value="">-- เลือกประเภท --</option>
+                                <option>หลักฐานการผ่านการอบรมมาตรฐานการวิจัยในมนุษย์</option>
+                                <option>หลักฐานการผ่านการอบรมมาตรฐานความปลอดภัยทางชีวภาพ</option>
+                                <option>หลักฐานการผ่านการอบรมมาตรฐานความปลอดภัยห้องปฏิบัติการ</option>
+                                <option>
+                                  หลักฐานการผ่านการอบรมมาตรฐานความปลอดภัยการดำเนินการต่อสัตว์เพื่องานทางวิทยาศาสตร์
+                                </option>
+                                <option>อื่น ๆ</option>
+                              </select>
+                            </td>
+
+                            <td>
+                              <a href="#" @click.prevent="openFile(item)" style="color:#1e88e5; cursor:pointer;">
+                                {{ item.name }}
+                              </a>
+                            </td>
+
+                            <td>{{ item.datetime }}</td>
+
+                            <td style="width:25%">
+                              <input type="text" v-model="item.note" class="form-control"
+                                placeholder="พิมพ์หมายเหตุ..." />
+                            </td>
+
+                            <td>
+                              <button type="button" class="btn btn-file mr-2" @click="triggerReplace(index)">
+                                แก้ไขไฟล์
+                              </button>
+
+
+                              <button type="button" class="btn btn-delete" @click="removeFile(index)">
+                                ลบ
+                              </button>
+                            </td>
+                          </tr>
+
+                        </tbody>
+                      </table>
+                      <input type="file" ref="replaceInput" style="display:none" @change="replaceFile" />
+
+                    </div>
+
+                  </div>
+                </div>
+
+              </div>
+            </CRow>
 
           </CCardBody>
           <CCardFooter class="d-flex justify-content-end">
@@ -413,7 +499,7 @@ export default {
             ['clean']
           ]
         }
-      },
+      }, files: [],
       // ปรับประเภททุนให้ตรงตามหัวข้อ 14.1 - 14.4
       budgetTypes: [
         { label: "ทุนนักวิจัยรุ่นใหม่", value: "new" },
@@ -530,6 +616,7 @@ export default {
       const element = document.body;
       html2pdf().from(element).save("Research_Form.pdf");
     },
+
     handleFileUpload(event, type) {
       const file = event.target.files[0];
       if (type === 'human') {
@@ -537,10 +624,65 @@ export default {
       } else {
         this.form.animalDetail.file = file;
       }
-    }
+    },  
+
+    handleFileUpload2(event) {
+      const selectedFiles = Array.from(event.target.files);
+
+      selectedFiles.forEach(file => {
+        this.files.push({
+          name: file.name,
+          size: (file.size / 1024).toFixed(2) + " KB",
+          datetime: new Date().toLocaleString("th-TH"),
+          note: "",
+          type: "",
+          raw: file
+        });
+
+      });
+
+      event.target.value = null;
+    },
+
+    openFile(item) {
+      if (!item.raw) {
+        alert("ไม่พบไฟล์");
+        return;
+      }
+
+      const fileURL = URL.createObjectURL(item.raw);
+      window.open(fileURL, "_blank");
+    },
+
+
+    removeFile(index) {
+      this.files.splice(index, 1);
+    },
+
+    triggerReplace(index) {
+      this.replaceIndex = index;
+      this.$refs.replaceInput.click();
+    },
+
+    replaceFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      if (this.replaceIndex !== null) {
+        this.files[this.replaceIndex].name = file.name;
+        this.files[this.replaceIndex].raw = file;
+      }
+
+      event.target.value = null;
+      this.replaceIndex = null;
+    },
+
   }
+
+
 };
 </script>
+
 
 <style scoped>
 /* ปรับแต่งความสวยงามของ Editor ให้เข้ากับ CoreUI */
@@ -559,5 +701,38 @@ export default {
   border: 1px solid #ebedef;
   border-bottom-left-radius: 4px;
   border-bottom-right-radius: 4px;
+}
+
+.table th {
+  font-weight: 600;
+  background: #f8f9fa;
+}
+
+.btn-file {
+  border: 1px solid #ced4da;
+  background: #f8f9fa;
+  padding: 4px 12px;
+  font-size: 14px;
+}
+
+.btn-delete {
+  border: 1px solid #dc3545;
+  color: #dc3545;
+  background: white;
+  padding: 4px 10px;
+}
+
+.btn-delete:hover {
+  background: #dc3545;
+  color: white;
+}
+
+.upload-btn {
+  font-size: 14px;
+}
+
+.small-text {
+  font-size: 13px;
+  color: #6c757d;
 }
 </style>
