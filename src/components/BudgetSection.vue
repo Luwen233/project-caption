@@ -28,10 +28,10 @@
 
           <div class="table-responsive bg-white rounded shadow-sm border overflow-hidden w-100">
             <table class="table table-sm table-bordered table-striped mb-0 align-middle">
-              <thead class="bg-dark text-white text-center small font-weight-bold">
+              <thead class="bg-dark text-white text-center font-weight-bold">
                 <tr>
                   <th style="width: 25%">รายการ</th>
-                  <th style="width: 25%">รายละเอียด/เครื่องคิดเลข (เกณฑ์ มฟล. 2569)</th>
+                  <th style="width: 25%">รายละเอียดตัวคูณ (เกณฑ์ มฟล. 2569)</th>
                   <th style="width: 12%">งบรวม (บาท)</th>
                   <th style="width: 10%">งวด 1</th>
                   <th style="width: 10%">งวด 2</th>
@@ -41,7 +41,7 @@
               </thead>
               <tbody>
                 <tr v-if="cat.rows.length === 0">
-                  <td colspan="7" class="text-center py-4 text-muted small">ยังไม่มีรายการในหมวดนี้</td>
+                  <td colspan="7" class="text-center py-4 text-muted">ยังไม่มีรายการในหมวดนี้</td>
                 </tr>
                 <tr v-for="(r, ri) in cat.rows" :key="ri">
                   <td class="px-3 py-2">
@@ -80,7 +80,7 @@
                     </div>
                   </td>
 
-                  <td class="py-2">
+                  <td class="py-2 align-middle">
                     <div v-if="r.multipliers" class="d-flex align-items-center justify-content-center"
                       style="gap: 5px;">
                       <div v-for="(m, mi) in r.multipliers" :key="mi" class="text-center">
@@ -93,14 +93,14 @@
                       placeholder="เช่น 500*3+100" @input="calculateManual(r)" />
                   </td>
 
-                  <td class="py-2">
+                  <td class="py-2 align-middle">
                     <div
-                      class="text-right font-weight-bold text-primary py-1 px-2 border rounded bg-light small shadow-none">
+                      class="text-right font-weight-bold text-primary py-1 px-2 border rounded bg-light shadow-none">
                       {{ Number(r.total || 0).toLocaleString() }}
                     </div>
                   </td>
 
-                  <td v-for="p in ['p1', 'p2', 'p3']" :key="p" class="py-2">
+                  <td v-for="p in ['p1', 'p2', 'p3']" :key="p" class="py-2 align-middle">
                     <CInput type="number" v-model.number="r[p]" size="sm"
                       :class="['mb-0 text-right shadow-none', r.errors[p] ? 'is-invalid-bg text-danger border-danger' : '']"
                       @input="validateInstallments(r, p)" />
@@ -108,9 +108,9 @@
                       style="font-size: 8px;">{{ r.errors[p] }}</small>
                   </td>
 
-                  <td class="text-center py-2">
-                    <CButton color="danger" variant="ghost" size="sm" @click="removeRow(ci, ri)">
-                      <CIcon name="cil-trash" />
+                  <td class="text-center py-2 align-middle">
+                    <CButton color="danger" variant="outline" class="px-2 py-2 font-weight-bold" size="sm" @click="removeRow(ci, ri)">
+                      <CIcon name="cil-trash" class="mr-1" />ลบรายการ
                     </CButton>
                   </td>
                 </tr>
