@@ -816,6 +816,680 @@ export default {
   }
 };
 </script>
+<script>
+// นำเข้า Editor และ CSS
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import { quillEditor } from 'vue-quill-editor'
+
+import BudgetSection from "@/components/BudgetSection.vue";
+import ResearchSection12 from "@/components/Section12.vue";
+import html2pdf from "html2pdf.js";
+
+export default {
+  name: "ResearchForm",
+  components: {
+    BudgetSection,
+    ResearchSection12,
+    quillEditor // ลงทะเบียน Editor
+  },
+  data() {
+    return {
+      editorOption: {
+        placeholder: 'พิมพ์เนื้อหาที่นี่...',
+        modules: {
+          toolbar: [
+            ['bold', 'italic', 'underline'],
+            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+            ['clean']
+          ]
+        }
+      },
+      // ปรับประเภททุนให้ตรงตามหัวข้อ 14.1 - 14.4
+      budgetTypes: [
+      { label: "ทุนนักวิจัยรุ่นใหม่", value: "new" },
+      { label: "ทุนพัฒนานักวิจัย", value: "dev" },
+      { label: "ทุนวิจัยที่สอดคล้องกับยุทธศาสตร์", value: "strategic" },
+      { label: "ทุนต่อยอดสู่ภาคอุตสาหกรรม", value: "industrial" }
+    ],
+      // รายละเอียดผลลัพธ์แยกตามประเภททุน
+      outcomes: {
+      newResearcher: [
+        "นำเสนอในการประชุมวิชาการระดับนานาชาติ โดยต้องเป็นบทความฉบับสมบูรณ์ (Fullpaper) ที่ได้รับการตีพิมพ์ในรายงานสืบเนื่องจากการประชุม (Proceedings)",
+        "ตีพิมพ์ในวารสารทางวิชาการที่มีรายชื่ออยู่ในฐานข้อมูล ตามประกาศ ก.พ.อ. เรื่องหลักเกณฑ์การพิจารณาวารสารทางวิชาการ สำหรับการเผยแพร่ผลงานทางวิชาการ",
+        "ตีพิมพ์วารสารทางวิชาการระดับชาติ ต้องเป็นวารสารทางวิชาการที่ปรากฏในฐานข้อมูลTCI กลุ่มที่ 1 หรือ กลุ่มที่ 2",
+        "อนุสิทธิบัตร/สิทธิบัตร (มีเลขคำขอฯ)"
+      ],
+      devResearcher: [
+        "ตีพิมพ์ในวารสารทางวิชาการระดับนานาชาติที่มีรายชื่ออยู่ในฐานข้อมูลตาม ประกาศก.พ.อ.เรื่องหลักเกณฑ์การพิจารณาวารสารทางวิชาการสำหรับการเผยแพร่ผลงานทางวิชาการ พ.ศ.2562",
+        "ตีพิมพ์วารสารทางวิชาการระดับชาติ ต้องเป็นวารสารทางวิชาการที่ปรากฏในฐานข้อมูล TCI กลุ่มที่ 1 เท่านั้น",
+        "อนุสิทธิบัตร/สิทธิบัตร (มีเลขคำขอฯ)"
+      ],
+      strategic: [
+        "ตีพิมพ์ในวารสารทางวิชาการระดับนานาชาติที่มีรายชื่ออยู่ในฐานข้อมูลตาม ประกาศ ก.พ.อ. เรื่องหลักเกณฑ์การพิจารณาวารสารทางวิชาการสำหรับการเผยแพร่ผลงานทางวิชาการ พ.ศ.2562",
+        "ตีพิมพ์วารสารทางวิชาการระดับชาติ ต้องเป็นวารสารทางวิชาการที่ปรากฏในฐานข้อมูล TCI กลุ่มที่ 1 เท่านั้น",
+        "อนุสิทธิบัตร/สิทธิบัตร (มีเลขคำขอฯ)"
+      ],
+      industrial: [
+        "การยื่นขอจดทะเบียนทรัพย์สินทางปัญญา (มีเลขคำขอฯ)"
+      ]
+      },
+      researchTypeOptions: [
+        { value: 'Science', label: 'ด้านวิทยาศาสตร์และเทคโนโลยี' },
+        { value: 'Health', label: 'ด้านวิทยาศาสตร์สุขภาพ' },
+        { value: 'Social', label: 'ด้านสังคมศาสตร์และมนุญศาสตร์' }
+      ],
+      textFields: [
+        { label: "5) คำสำคัญ (Keywords)", model: "keywords" },
+        { label: "6) ความสำคัญของปัญหาและแนวคิด", model: "importance" },
+        { label: "7) วัตถุประสงค์", model: "objective" },
+        { label: "8) ทบทวนวรรณกรรม", model: "literature" },
+        { label: "9) เอกสารอ้างอิง", model: "reference" },
+        { label: "10) วิธีดำเนินการวิจัย", model: "methodology" },
+        { label: "11) ขอบเขตการวิจัย", model: "scope" }
+      ],
+      form: {
+        titleTH: "", 
+        titleEN: "", 
+        budgetType: "", 
+        budgets: [],
+        cooperation: "ไม่มี", 
+        cooperationDetail: "", 
+        researchType: "",
+        keywords: "", 
+        importance: "", 
+        objective: "", 
+        literature: "",
+        reference: "", 
+        methodology: "", 
+        scope: "", 
+        progressReport: "",
+        expectedResults: [], 
+        integration: "", 
+        transferLevel: "ไม่มี",
+        ethics: { human: false, animal: false }, 
+        remark: "",
+        selectedOutcomes: [], // สำหรับเก็บผลลัพธ์ที่ user ติ๊กเลือก
+        
+        // เพิ่มส่วนข้อมูลนักวิจัย
+        researchers: {
+          // 1.1 หัวหน้าโครงการวิจัย
+          mainResearcher: {
+            name: "",
+            affiliation: "",
+            phone: "",
+            email: "",
+            code: ""
+          },
+          // 1.2 ผู้ร่วมโครงการวิจัย (array เพราะเพิ่มได้หลายคน)
+          coResearchers: [],
+          // 2) ที่ปรึกษาโครงการวิจัย (array เพราะเพิ่มได้หลายคน)
+          advisors: [],
+          // 3) ความร่วมมือด้านการวิจัยกับหน่วยงานภายนอก
+          externalCollaboration: {
+            hasCollaboration: "ไม่มี",
+            details: ""
+          }
+        },
+        
+        // เพิ่มส่วนข้อมูลลายเซ็น (ข้อ 19)
+        signatures: {
+          headResearcher: {
+            name: ""
+          },
+          coResearcher: {
+            name: ""
+          },
+          advisors: [
+            {
+              name: "",
+              affiliation: "",
+              phone: ""
+            }
+          ]
+        }
+      },
+      
+    };
+  },
+  watch: {
+    // เมื่อเปลี่ยนประเภททุน ให้ล้างค่าที่เคยเลือกไว้ในข้อ 14 เพื่อป้องกันข้อมูลปนกัน
+    'form.budgetType': function() {
+      this.form.selectedOutcomes = [];
+    }
+  },
+  methods: {
+    // เพิ่มผู้ร่วมโครงการวิจัย
+    addCoResearcher() {
+      this.form.researchers.coResearchers.push({
+        name: "",
+        affiliation: "",
+        phone: "",
+        email: "",
+        code: ""
+      });
+    },
+    
+    // ลบผู้ร่วมโครงการวิจัย
+    removeCoResearcher(index) {
+      this.form.researchers.coResearchers.splice(index, 1);
+    },
+    
+    // เพิ่มที่ปรึกษาโครงการ
+    addAdvisor() {
+      this.form.researchers.advisors.push({
+        name: "",
+        affiliation: "",
+        phone: "",
+        email: ""
+      });
+    },
+    
+    // ลบที่ปรึกษาโครงการ
+    removeAdvisor(index) {
+      this.form.researchers.advisors.splice(index, 1);
+    },
+    
+    // เพิ่มที่ปรึกษาในส่วนลายเซ็น (ข้อ 19)
+    addSignatureAdvisor() {
+      this.form.signatures.advisors.push({
+        name: "",
+        affiliation: "",
+        phone: ""
+      });
+    },
+    
+    // ลบที่ปรึกษาในส่วนลายเซ็น (ข้อ 19)
+    removeSignatureAdvisor(index) {
+      if (this.form.signatures.advisors.length > 1) {
+        this.form.signatures.advisors.splice(index, 1);
+      }
+    },
+    
+    submit() { 
+      console.log(this.form); 
+      alert("บันทึกสำเร็จ"); 
+    },
+    
+    // ============================================================
+    // [เพิ่มใหม่] exportPDF - แทนที่ฟังก์ชันเดิมทั้งหมด
+    // สร้าง PDF ครบทุกหน้าตามแบบฟอร์ม RS-1 ของมหาวิทยาลัยแม่ฟ้าหลวง
+    // ============================================================
+    exportPDF() {
+      const pdfContent = this.generatePDFContent();
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = pdfContent;
+      // กำหนด style สำหรับ element ชั่วคราว
+      tempDiv.style.position = 'absolute';
+      tempDiv.style.left = '-9999px';
+      tempDiv.style.top = '0';
+      document.body.appendChild(tempDiv);
+
+      // ตั้งค่า html2pdf
+      const opt = {
+        margin:       [10, 15, 10, 15], // top, right, bottom, left (mm)
+        filename:     'Research_Form_RS1.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+      };
+
+      html2pdf().from(tempDiv).set(opt).save().then(() => {
+        document.body.removeChild(tempDiv);
+      });
+    },
+
+    // ============================================================
+    // [เพิ่มใหม่] generatePDFContent - สร้าง HTML ครบทุกหน้า
+    // ตามแบบฟอร์ม RS-1 ของมหาวิทยาลัยแม่ฟ้าหลวง
+    // ============================================================
+    generatePDFContent() {
+      const f = this.form;
+
+      // วันที่ปัจจุบัน (พ.ศ.)
+      const now = new Date();
+      const dd   = String(now.getDate()).padStart(2,'0');
+      const mm   = String(now.getMonth()+1).padStart(2,'0');
+      const yyyy = now.getFullYear() + 543;
+      const currentDate = `${dd}/${mm}/${yyyy}`;
+
+      // helper: strip html tags จาก quill output
+      const stripHtml = (html) => {
+        if (!html) return '';
+        return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g,' ').trim();
+      };
+
+      // helper: checkbox สำหรับ PDF
+      const chk = (checked) => checked
+        ? `<span style="font-size:13px;">&#9745;</span>`
+        : `<span style="font-size:13px;">&#9744;</span>`;
+
+      // -------------------------------------------------------
+      // หัวกระดาษทุกหน้า (ใส่ใน style page-header)
+      // -------------------------------------------------------
+      const pageHeader = `
+        <div style="text-align:right; font-size:10px; color:#333; margin-bottom:4px;">RS-1</div>
+      `;
+
+      // -------------------------------------------------------
+      // หน้า 1 - ข้อมูลทั่วไป (ข้อ 1-2)
+      // -------------------------------------------------------
+      const page1 = `
+        <div style="page-break-after:always; padding:0 5mm;">
+          ${pageHeader}
+          <div style="text-align:center; font-weight:bold; font-size:14px; margin-bottom:8px;">แบบเสนอโครงการวิจัย</div>
+          <div style="text-align:center; font-size:11px; margin-bottom:14px;">
+            ประกอบการของบประมาณงานวิจัยของมหาวิทยาลัยแม่ฟ้าหลวง ประจำปีงบประมาณ พ.ศ. 2569
+          </div>
+
+          <!-- ประเภททุน checkboxes 2x2 -->
+          <table style="width:100%; margin-bottom:14px; font-size:11px;">
+            <tr>
+              <td style="width:50%; padding:3px 0;">
+                ${chk(f.budgetType==='ทุนนักวิจัยรุ่นใหม่')} ทุนนักวิจัยรุ่นใหม่
+              </td>
+              <td style="width:50%; padding:3px 0;">
+                ${chk(f.budgetType==='ทุนพัฒนานักวิจัย')} ทุนพัฒนานักวิจัย
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:3px 0;">
+                ${chk(f.budgetType==='ทุนวิจัยที่สอดคล้องกับยุทธศาสตร์')} ทุนที่สอดคล้องกับยุทธศาสตร์การวิจัย
+              </td>
+              <td style="padding:3px 0;">
+                ${chk(f.budgetType==='ทุนต่อยอดสู่ภาคอุตสาหกรรม')} ทุนต่อยอดสู่ภาคอุตสาหกรรมและนวัตกรรม ภายใต้กรอบวิจัยยุทธศาสตร์ชาติ
+              </td>
+            </tr>
+          </table>
+
+          <!-- ข้อ 1 ชื่อโครงการ -->
+          <div style="font-weight:bold; font-size:11px; margin-bottom:4px;">1. ชื่อโครงการ</div>
+          <div style="font-size:11px; margin-bottom:2px; margin-left:10px;">
+            (ภาษาไทย) <span style="border-bottom:1px solid #000; display:inline-block; min-width:400px; padding:0 4px;">${f.titleTH || ''}</span>
+          </div>
+          <div style="font-size:11px; margin-bottom:10px; margin-left:10px;">
+            (ภาษาอังกฤษ) <span style="border-bottom:1px solid #000; display:inline-block; min-width:380px; padding:0 4px;">${f.titleEN || ''}</span>
+          </div>
+
+          <!-- ข้อ 2 ระบุความสอดคล้อง -->
+          <div style="font-weight:bold; font-size:11px; margin-bottom:6px;">
+            2. ระบุความสอดคล้องของโครงการวิจัยกับประเด็นยุทธศาสตร์การวิจัยมหาวิทยาลัยแม่ฟ้าหลวง<br>
+            <span style="font-weight:normal;">โปรดเลือกกลุ่มที่สอดคล้องมากที่สุดเพียง 1 ข้อ (ทำเครื่องหมาย ✓ หน้าข้อ)</span>
+          </div>
+          <div style="font-size:10.5px; margin-left:10px; line-height:1.8;">
+            <div>1. ประเภททุนนักวิจัยใหม่</div>
+            <div style="margin-left:15px;">${chk(f.budgetType==='ทุนนักวิจัยรุ่นใหม่')} 1. โครงการวิจัยที่เสนอมีความสอดคล้องกับคุณวุฒิ หรือสาขาวิชา หรือภาระงาน</div>
+            <div style="margin-top:4px;">2. ประเภททุนพัฒนานักวิจัย และทุนที่สอดคล้องกับยุทธศาสตร์การวิจัยและนวัตกรรม ภายใต้กรอบวิจัยยุทธศาสตร์ชาติ</div>
+            <div style="margin-left:15px;">${chk(false)} 1. การพัฒนาเศรษฐกิจไทยด้วยเศรษฐกิจสร้างคุณค่าและเศรษฐกิจสร้างสรรค์ ให้มีความสามารถในการแข่งขันและพึ่งพาตนเองได้อย่างยั่งยืน</div>
+            <div style="margin-left:15px;">${chk(false)} 2. การยกระดับสังคมและสิ่งแวดล้อม ให้มีการพัฒนาอย่างยั่งยืน สามารถแก้ไข ปัญหาท้าทายและปรับตัวได้ทันต่อ พลวัตการเปลี่ยนแปลงของโลก</div>
+            <div style="margin-left:15px;">${chk(false)} 3. การพัฒนาวิทยาศาสตร์ เทคโนโลยี การวิจัยและนวัตกรรม ระดับขั้นแนวหน้าที่ก้าวหน้าล้ำยุค เพื่อสร้างโอกาสใหม่และความพร้อมของประเทศในอนาคต</div>
+            <div style="margin-left:15px;">${chk(false)} 4. การพัฒนากำลังคนและสถาบัน ด้านวิทยาศาสตร์ วิจัยและนวัตกรรม ให้เป็นฐานการขับเคลื่อนการพัฒนาเศรษฐกิจและสังคมของประเทศแบบก้าวกระโดดและอย่างยั่งยืน</div>
+            <div style="margin-top:4px;">3. ประเภททุนต่อยอดสู่ภาคอุตสาหกรรม</div>
+            <div style="margin-left:15px;">${chk(f.budgetType==='ทุนต่อยอดสู่ภาคอุตสาหกรรม')} 1. การวิจัยและสร้างนวัตกรรมเพื่อเพิ่มขีดความสามารถการแข่งขัน</div>
+          </div>
+        </div>
+      `;
+
+      // -------------------------------------------------------
+      // หน้า 2 - ส่วน ก คณะผู้วิจัย
+      // -------------------------------------------------------
+      const main = f.researchers.mainResearcher;
+      const coList = f.researchers.coResearchers || [];
+      const advisorList = f.researchers.advisors || [];
+
+      // สร้าง HTML สำหรับผู้ร่วมโครงการ
+      let coResearchersHtml = '';
+      coList.forEach((co, i) => {
+        coResearchersHtml += `
+          <div style="margin-left:20px; margin-bottom:10px; font-size:10.5px; line-height:2;">
+            <div style="font-weight:bold;">1.${i+2} ผู้ร่วมโครงการวิจัย</div>
+            <div>ชื่อ-สกุล <span style="border-bottom:1px solid #000; display:inline-block; min-width:300px; padding:0 4px;">${co.name||''}</span></div>
+            <div>สังกัดหน่วยงาน <span style="border-bottom:1px solid #000; display:inline-block; min-width:280px; padding:0 4px;">${co.affiliation||''}</span></div>
+            <div>เบอร์โทรศัพท์ที่ติดต่อได้ <span style="border-bottom:1px solid #000; display:inline-block; min-width:200px; padding:0 4px;">${co.phone||''}</span></div>
+            <div>E-mail address <span style="border-bottom:1px solid #000; display:inline-block; min-width:270px; padding:0 4px;">${co.email||''}</span></div>
+            <div>ความรับผิดชอบต่อโครงการที่เสนอ คิดเป็นสัดส่วนการวิจัยร้อยละ <span style="border-bottom:1px solid #000; display:inline-block; min-width:60px; padding:0 4px;">${co.code||''}</span></div>
+          </div>
+        `;
+      });
+
+      // สร้าง HTML สำหรับที่ปรึกษา
+      let advisorsHtml = '';
+      advisorList.forEach((adv) => {
+        advisorsHtml += `
+          <div style="margin-left:20px; margin-bottom:10px; font-size:10.5px; line-height:2;">
+            <div>ชื่อ-สกุล <span style="border-bottom:1px solid #000; display:inline-block; min-width:300px; padding:0 4px;">${adv.name||''}</span></div>
+            <div>สังกัดหน่วยงาน <span style="border-bottom:1px solid #000; display:inline-block; min-width:280px; padding:0 4px;">${adv.affiliation||''}</span></div>
+            <div>เบอร์โทรศัพท์ที่ติดต่อได้ <span style="border-bottom:1px solid #000; display:inline-block; min-width:200px; padding:0 4px;">${adv.phone||''}</span></div>
+            <div>E-mail address <span style="border-bottom:1px solid #000; display:inline-block; min-width:270px; padding:0 4px;">${adv.email||''}</span></div>
+          </div>
+        `;
+      });
+
+      const page2 = `
+        <div style="page-break-after:always; padding:0 5mm;">
+          ${pageHeader}
+          <div style="text-decoration:underline; font-weight:bold; font-size:12px; margin-bottom:8px;">ส่วน ก : สาระสำคัญของข้อเสนอโครงการวิจัย</div>
+
+          <!-- 1. คณะผู้วิจัย -->
+          <div style="font-weight:bold; font-size:11px; margin-bottom:6px;">1. คณะผู้วิจัย</div>
+
+          <!-- 1.1 หัวหน้า -->
+          <div style="margin-left:20px; margin-bottom:10px; font-size:10.5px; line-height:2;">
+            <div style="font-weight:bold;">1.1 หัวหน้าโครงการวิจัย</div>
+            <div>ชื่อ-สกุล <span style="border-bottom:1px solid #000; display:inline-block; min-width:300px; padding:0 4px;">${main.name||''}</span></div>
+            <div>สังกัดหน่วยงาน <span style="border-bottom:1px solid #000; display:inline-block; min-width:280px; padding:0 4px;">${main.affiliation||''}</span></div>
+            <div>เบอร์โทรศัพท์ที่ติดต่อได้ <span style="border-bottom:1px solid #000; display:inline-block; min-width:200px; padding:0 4px;">${main.phone||''}</span></div>
+            <div>E-mail address <span style="border-bottom:1px solid #000; display:inline-block; min-width:270px; padding:0 4px;">${main.email||''}</span></div>
+            <div>ความรับผิดชอบต่อโครงการที่เสนอ คิดเป็นสัดส่วนการวิจัยร้อยละ <span style="border-bottom:1px solid #000; display:inline-block; min-width:60px; padding:0 4px;">${main.code||''}</span></div>
+          </div>
+
+          <!-- ผู้ร่วมโครงการ -->
+          ${coResearchersHtml}
+
+          <!-- 2. ที่ปรึกษา -->
+          <div style="font-weight:bold; font-size:11px; margin-bottom:4px;">2. ที่ปรึกษาโครงการวิจัย</div>
+          ${advisorsHtml}
+
+          <!-- 3. ความร่วมมือภายนอก -->
+          <div style="font-weight:bold; font-size:11px; margin-bottom:4px;">3. ความร่วมมือด้านการวิจัยกับหน่วยงานภายนอก</div>
+          <div style="margin-left:20px; font-size:10.5px; margin-bottom:10px;">
+            ${f.researchers.externalCollaboration.hasCollaboration === 'มี'
+              ? f.researchers.externalCollaboration.details || '-'
+              : '-'}
+          </div>
+
+          <!-- 4. ประเภทของการวิจัย -->
+          <div style="font-weight:bold; font-size:11px; margin-bottom:2px;">4. ประเภทของการวิจัย</div>
+          <div style="margin-left:20px; font-size:10.5px; margin-bottom:10px;">
+            <span style="border-bottom:1px solid #000; display:inline-block; min-width:300px; padding:0 4px;">
+              ${f.researchType || ''}
+            </span>
+          </div>
+
+          <!-- 5. คำสำคัญ -->
+          <div style="font-weight:bold; font-size:11px; margin-bottom:2px;">5. คำสำคัญ (Keywords) ของโครงการวิจัย</div>
+          <div style="margin-left:20px; font-size:10.5px; margin-bottom:10px; line-height:1.6;">
+            ${stripHtml(f.keywords) || ''}
+          </div>
+        </div>
+      `;
+
+      // -------------------------------------------------------
+      // หน้า 3-10 - เนื้อหาหลัก (ข้อ 6-12)
+      // -------------------------------------------------------
+      const page3 = `
+        <div style="page-break-after:always; padding:0 5mm;">
+          ${pageHeader}
+
+          <!-- 6. ความสำคัญของปัญหา -->
+          <div style="font-weight:bold; font-size:11px; margin-bottom:4px;">6. ความสำคัญที่มาของปัญหาทำการวิจัย และกรอบแนวความคิด (Conceptual Framework)</div>
+          <div style="font-size:10.5px; margin-bottom:12px; line-height:1.7; text-indent:1em;">
+            ${stripHtml(f.importance) || ''}
+          </div>
+
+          <!-- 7. วัตถุประสงค์ -->
+          <div style="font-weight:bold; font-size:11px; margin-bottom:4px;">7. วัตถุประสงค์ของโครงการวิจัย</div>
+          <div style="font-size:10.5px; margin-bottom:12px; line-height:1.7; margin-left:10px;">
+            ${stripHtml(f.objective) || ''}
+          </div>
+        </div>
+      `;
+
+      const page4 = `
+        <div style="page-break-after:always; padding:0 5mm;">
+          ${pageHeader}
+
+          <!-- 8. ทบทวนวรรณกรรม -->
+          <div style="font-weight:bold; font-size:11px; margin-bottom:4px;">8. การทบทวนวรรณกรรม ผลงานวิจัยต่าง ๆ ที่เกี่ยวข้อง</div>
+          <div style="font-size:10.5px; margin-bottom:12px; line-height:1.7; text-indent:1em;">
+            ${stripHtml(f.literature) || ''}
+          </div>
+
+          <!-- 9. เอกสารอ้างอิง -->
+          <div style="font-weight:bold; font-size:11px; margin-bottom:4px;">9. เอกสารอ้างอิงของโครงการวิจัย</div>
+          <div style="font-size:10.5px; margin-bottom:12px; line-height:1.7; margin-left:10px;">
+            ${stripHtml(f.reference) || ''}
+          </div>
+        </div>
+      `;
+
+      const page5 = `
+        <div style="page-break-after:always; padding:0 5mm;">
+          ${pageHeader}
+
+          <!-- 10. วิธีดำเนินการวิจัย -->
+          <div style="font-weight:bold; font-size:11px; margin-bottom:4px;">10. กระบวนการและวิธีการดำเนินโครงการวิจัย สถานที่ทำการทดลองและเก็บข้อมูล</div>
+          <div style="font-size:10.5px; margin-bottom:12px; line-height:1.7; text-indent:1em;">
+            ${stripHtml(f.methodology) || ''}
+          </div>
+
+          <!-- 11. ขอบเขต -->
+          <div style="font-weight:bold; font-size:11px; margin-bottom:4px;">11. ขอบเขตของโครงการวิจัย</div>
+          <div style="font-size:10.5px; margin-bottom:12px; line-height:1.7; margin-left:10px;">
+            ${stripHtml(f.scope) || ''}
+          </div>
+        </div>
+      `;
+
+      // -------------------------------------------------------
+      // หน้า - ข้อ 13-16
+      // -------------------------------------------------------
+      // สร้าง HTML สำหรับ outcomes ที่เลือก
+      const outcomeSelected = f.selectedOutcomes || [];
+      let outcomesHtml = '';
+      if (f.budgetType === 'ทุนนักวิจัยรุ่นใหม่') {
+        outcomesHtml += `<div style="font-weight:bold; margin-bottom:4px;">14.1 ทุนนักวิจัยรุ่นใหม่</div>`;
+        this.outcomes.newResearcher.forEach(item => {
+          outcomesHtml += `<div style="margin-left:15px; margin-bottom:3px;">${chk(outcomeSelected.includes(item))} ${item}</div>`;
+        });
+      } else if (f.budgetType === 'ทุนพัฒนานักวิจัย') {
+        outcomesHtml += `<div style="font-weight:bold; margin-bottom:4px;">14.2 ทุนพัฒนานักวิจัย</div>`;
+        this.outcomes.devResearcher.forEach(item => {
+          outcomesHtml += `<div style="margin-left:15px; margin-bottom:3px;">${chk(outcomeSelected.includes(item))} ${item}</div>`;
+        });
+      } else if (f.budgetType === 'ทุนวิจัยที่สอดคล้องกับยุทธศาสตร์') {
+        outcomesHtml += `<div style="font-weight:bold; margin-bottom:4px;">14.3 ทุนวิจัยที่สอดคล้องกับยุทธศาสตร์</div>`;
+        this.outcomes.strategic.forEach(item => {
+          outcomesHtml += `<div style="margin-left:15px; margin-bottom:3px;">${chk(outcomeSelected.includes(item))} ${item}</div>`;
+        });
+      } else if (f.budgetType === 'ทุนต่อยอดสู่ภาคอุตสาหกรรม') {
+        outcomesHtml += `<div style="font-weight:bold; margin-bottom:4px;">14.4 ทุนต่อยอดสู่ภาคอุตสาหกรรม</div>`;
+        this.outcomes.industrial.forEach(item => {
+          outcomesHtml += `<div style="margin-left:15px; margin-bottom:3px;">${chk(outcomeSelected.includes(item))} ${item}</div>`;
+        });
+      }
+
+      const page6 = `
+        <div style="page-break-after:always; padding:0 5mm;">
+          ${pageHeader}
+
+          <!-- 13. ผลงานตามระยะเวลา -->
+          <div style="font-weight:bold; font-size:11px; margin-bottom:4px;">13. ผลงานตามระยะเวลาการรายงานความก้าวหน้างานวิจัย</div>
+          <div style="font-size:10.5px; margin-bottom:12px; line-height:1.7; margin-left:10px;">
+            ${stripHtml(f.progressReport) || ''}
+          </div>
+
+          <!-- 14. ผลลัพธ์ที่คาดว่าจะได้รับ -->
+          <div style="font-weight:bold; font-size:11px; margin-bottom:6px;">14. ผลลัพธ์ที่คาดว่าจะได้รับจากงานวิจัยเมื่อเสร็จสิ้นการวิจัย *</div>
+          <div style="font-size:10.5px; margin-bottom:12px; line-height:1.7; margin-left:10px;">
+            ${outcomesHtml}
+          </div>
+
+          <!-- 15. การบูรณาการ -->
+          <div style="font-weight:bold; font-size:11px; margin-bottom:4px;">15. การบูรณาการงานวิจัย</div>
+          <div style="font-size:10.5px; margin-bottom:12px; line-height:1.7; margin-left:10px;">
+            ${stripHtml(f.IntegrationResearch) || '-'}
+          </div>
+
+          <!-- 16. ระดับการถ่ายทอดสู่สังคม -->
+          <div style="font-weight:bold; font-size:11px; margin-bottom:4px;">16. ระดับการถ่ายทอดสู่สังคม</div>
+          <div style="font-size:10.5px; margin-bottom:4px; margin-left:10px;">
+            ${chk(f.transferLevel==='สามารถนำไปถ่ายทอดเป็นต้นแบบและแนวทางได้ในระดับภูมิภาค ประเทศ หรือนานาชาติ')}
+            สามารถนำไปถ่ายทอดเป็นต้นแบบและแนวทางได้ในระดับภูมิภาค ประเทศ หรือนานาชาติ
+          </div>
+          <div style="font-size:10.5px; margin-bottom:4px; margin-left:10px;">
+            ${chk(f.transferLevel==='สามารถนำไปถ่ายทอดเป็นต้นแบบและแนวทางได้เฉพาะกลุ่มอาชีพ ชุมชน หรือจังหวัด')}
+            สามารถนำไปถ่ายทอดเป็นต้นแบบและแนวทางได้เฉพาะกลุ่มอาชีพ ชุมชน หรือจังหวัด
+          </div>
+          <div style="font-size:10.5px; margin-bottom:12px; margin-left:10px;">
+            ${chk(f.transferLevel==='ไม่มีการนำไปถ่ายทอดสู่สังคม')} ไม่มีการนำไปถ่ายทอดสู่สังคม
+          </div>
+        </div>
+      `;
+
+      // -------------------------------------------------------
+      // หน้า - ข้อ 17 งบประมาณ (ตาราง)
+      // -------------------------------------------------------
+      const budgets = f.budgets || [];
+      let budgetRows = '';
+      const categories = ['ค่าตอบแทนค่าจ้าง','ค่าใช้สอย','ค่าวัสดุ','ค่าครุภัณฑ์ (ถ้ามี)'];
+
+      categories.forEach((cat, ci) => {
+        const b = budgets[ci] || {};
+        budgetRows += `
+          <tr>
+            <td style="border:1px solid #000; padding:4px 6px; font-size:10px;">${ci+1}. ${cat}</td>
+            <td style="border:1px solid #000; padding:4px 6px; font-size:10px; text-align:right;">${b.q1||''}</td>
+            <td style="border:1px solid #000; padding:4px 6px; font-size:10px; text-align:right;">${b.q2||''}</td>
+            <td style="border:1px solid #000; padding:4px 6px; font-size:10px; text-align:right;">${b.q3||''}</td>
+            <td style="border:1px solid #000; padding:4px 6px; font-size:10px; text-align:right;">${b.total||''}</td>
+            <td style="border:1px solid #000; padding:4px 6px; font-size:10px; text-align:right;">${b.percent||''}</td>
+          </tr>
+        `;
+      });
+
+      const page7 = `
+        <div style="page-break-after:always; padding:0 5mm;">
+          ${pageHeader}
+
+          <!-- 17. งบประมาณ -->
+          <div style="font-weight:bold; font-size:11px; margin-bottom:6px;">17. งบประมาณ</div>
+          <table style="width:100%; border-collapse:collapse; font-size:10px; margin-bottom:12px;">
+            <thead>
+              <tr style="background:#f0f0f0;">
+                <th style="border:1px solid #000; padding:4px 6px; text-align:left;">หมวด (ตามสัญญา)</th>
+                <th style="border:1px solid #000; padding:4px 6px; text-align:center;">งวดที่ 1</th>
+                <th style="border:1px solid #000; padding:4px 6px; text-align:center;">งวดที่ 2</th>
+                <th style="border:1px solid #000; padding:4px 6px; text-align:center;">งวด 3</th>
+                <th style="border:1px solid #000; padding:4px 6px; text-align:center;">งบประมาณรวมทั้งโครงการ</th>
+                <th style="border:1px solid #000; padding:4px 6px; text-align:center;">ร้อยละ</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${budgetRows}
+              <tr>
+                <td style="border:1px solid #000; padding:4px 6px; font-weight:bold; font-size:10px;">รวม</td>
+                <td style="border:1px solid #000; padding:4px 6px; font-size:10px; text-align:right;"></td>
+                <td style="border:1px solid #000; padding:4px 6px; font-size:10px; text-align:right;"></td>
+                <td style="border:1px solid #000; padding:4px 6px; font-size:10px; text-align:right;"></td>
+                <td style="border:1px solid #000; padding:4px 6px; font-size:10px; text-align:right;"></td>
+                <td style="border:1px solid #000; padding:4px 6px; font-size:10px; text-align:right;">100.00</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+
+      // -------------------------------------------------------
+      // หน้าสุดท้าย - ข้อ 18-19 (มาตรฐานวิจัย + ลายเซ็น)
+      // -------------------------------------------------------
+      // ลายเซ็นที่ปรึกษาเพิ่มเติม render ตรงใน pageLast แล้ว ไม่ต้องสร้าง variable แยก
+
+      const pageLast = `
+        <div style="padding:0 5mm;">
+          ${pageHeader}
+
+          <!-- 18. มาตรฐานการวิจัย -->
+          <div style="font-weight:bold; font-size:11px; margin-bottom:6px;">18. มาตรฐานการวิจัย</div>
+          <div style="font-size:10.5px; margin-left:10px; margin-bottom:4px;">
+            ${chk(!f.ethics.human && !f.ethics.animal)}
+            ไม่มีการทำวิจัยในมนุษย์ / ไม่มีการใช้สัตว์ทดลอง / การวิจัยที่เกี่ยวข้องกับงานด้านเทคโนโลยีชีวภาพสมัยใหม่
+          </div>
+          <div style="font-size:10.5px; margin-left:10px; margin-bottom:4px;">
+            ${chk(f.ethics.human)} มีการทำวิจัยในมนุษย์
+          </div>
+          <div style="font-size:10.5px; margin-left:10px; margin-bottom:16px;">
+            ${chk(f.ethics.animal)} มีการใช้สัตว์ทดลอง
+          </div>
+
+          <!-- 19. คำขี้แจงอื่นๆ + ลายเซ็น -->
+          <div style="font-size:11px; margin-bottom:20px;">
+            19. คำขี้แจงอื่นๆ(ถ้ามี)...........................................................................................................................
+          </div>
+
+          <!-- ลายเซ็น 2 คอลัมน์: ที่ปรึกษา (ซ้าย) + หัวหน้า (ขวา) -->
+          <table style="width:100%; margin-bottom:30px;">
+            <tr>
+              <td style="width:50%; text-align:center; vertical-align:top; padding:10px;">
+                <div style="margin-bottom:6px;">ลงชื่อ</div>
+                <div style="font-size:16px; font-weight:bold; color:#00008B; margin-bottom:4px;">${f.signatures.headResearcher.name||''}</div>
+                <div style="border-top:1px solid #000; width:80%; margin:0 auto 4px; padding-top:2px;">
+                  (............${f.signatures.headResearcher.name||''}............)
+                </div>
+                <div>ที่ปรึกษาโครงการวิจัย</div>
+                <div>วันที่.........${currentDate}..........................</div>
+              </td>
+              <td style="width:50%; text-align:center; vertical-align:top; padding:10px;">
+                <div style="margin-bottom:6px;">ลงชื่อ</div>
+                <div style="font-size:16px; font-weight:bold; color:#00008B; margin-bottom:4px;">${f.signatures.coResearcher.name||''}</div>
+                <div style="border-top:1px solid #000; width:80%; margin:0 auto 4px; padding-top:2px;">
+                  (............${f.signatures.coResearcher.name||''}............)
+                </div>
+                <div>หัวหน้าโครงการวิจัย</div>
+                <div>วันที่.........${currentDate}..........................</div>
+              </td>
+            </tr>
+          </table>
+
+          <!-- ลายเซ็นที่ปรึกษาเพิ่มเติม (ผู้ร่วม) -->
+          <table style="width:100%;">
+            <tr>
+              ${(f.signatures.advisors||[]).map(adv => `
+                <td style="width:50%; text-align:center; vertical-align:top; padding:10px;">
+                  <div style="margin-bottom:6px;">ลงชื่อ</div>
+                  <div style="font-size:16px; font-weight:bold; color:#00008B; margin-bottom:4px;">${adv.name||''}</div>
+                  <div style="border-top:1px solid #000; width:80%; margin:0 auto 4px; padding-top:2px;">
+                    (............${adv.name||''}............)
+                  </div>
+                  <div>ผู้ร่วมโครงการวิจัย</div>
+                  <div>วันที่.........${currentDate}..........................</div>
+                </td>
+              `).join('')}
+            </tr>
+          </table>
+        </div>
+      `;
+
+      // -------------------------------------------------------
+      // รวมทุกหน้า + style หลัก
+      // -------------------------------------------------------
+      return `
+        <div style="
+          font-family: 'TH Sarabun New', 'Sarabun', 'Angsana New', Arial, sans-serif;
+          font-size: 11px;
+          line-height: 1.6;
+          color: #000;
+          width: 190mm;
+          margin: 0 auto;
+        ">
+          ${page1}
+          ${page2}
+          ${page3}
+          ${page4}
+          ${page5}
+          ${page6}
+          ${page7}
+          ${pageLast}
+        </div>
+      `;
+    }
+    // ============================================================
+    // จบส่วนที่เพิ่มใหม่ generatePDFContent
+    // ============================================================
+  }
+};
+</script>
 <style scoped>
 /* ปรับแต่งความสวยงามของ Editor ให้เข้ากับ CoreUI */
 .quill-editor {
