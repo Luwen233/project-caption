@@ -18,7 +18,7 @@
 
         <div class="table-responsive">
           <table class="table table-bordered align-middle mb-0">
-            <thead class="bg-light">
+            <thead class="bg-primary">
               <tr>
                 <th style="width:25%">ประเภทเอกสาร</th>
                 <th style="width:25%">ชื่อไฟล์</th>
