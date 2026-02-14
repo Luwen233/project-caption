@@ -50,7 +50,7 @@
           </CRow>
         </CCardBody>
       </CCard>
-
+<!-- ---------------------------------------------------------------------- -->
       <CCard class="shadow-sm w-100 mb-4 border-0">
         <CCardHeader class="bg-primary text-white py-3">
           <h5 class="m-0 font-weight-bold">
@@ -153,7 +153,7 @@
           </div>
         </CCardBody>
       </CCard>
-
+<!-- ---------------------------------------------------------------------- -->
       <CCard class="shadow-sm w-100 mb-4 border-0">
         <CCardHeader class="bg-primary text-white py-3">
           <h5 class="m-0 font-weight-bold">
@@ -175,7 +175,7 @@
           </div>
         </CCardBody>
       </CCard>
-
+<!-- ---------------------------------------------------------------------- -->
       <CCard class="shadow-sm w-100 mb-4 border-0">
         <CCardHeader class="bg-primary text-white py-3">
           <h5 class="m-0 font-weight-bold">
@@ -194,7 +194,7 @@
           </h5>
         </CCardHeader>
         <CCardBody class="p-4">
-
+<!-- ---------------------------------------------------------------------- -->
           <div class="mb-5">
             <h5 class="font-weight-bold text-dark">13) ผลงานตามระยะเวลาการรายงาน</h5>
             <quill-editor v-model="form.progressReport" :options="editorOption" class="mb-4" />
@@ -374,9 +374,9 @@
                       </div>
                     </div>
 
-                    <button type="button" class="btn btn-outline-secondary upload-btn" @click="$refs.fileInput.click()">
+                    <button type="button" class="btn btn-outline-dark upload-btn" @click="$refs.fileInput.click()">
                       <i class="fas fa-upload mr-1"></i>
-                      อัปโหลดไฟล์
+                      <CIcon name="cil-paperclip" class="mr-1"/> อัปโหลดไฟล์
                     </button>
                     <input type="file" ref="fileInput" multiple style="display: none" @change="handleFileUpload2" />
                   </div>
@@ -424,12 +424,12 @@
 
                           <td>
                             <button type="button" class="btn btn-file mr-2" @click="triggerReplace(index)">
-                              แก้ไขไฟล์
+                              <CIcon name="cil-settings" class="mr-2"/>แก้ไขไฟล์
                             </button>
 
 
                             <button type="button" class="btn btn-delete" @click="removeFile(index)">
-                              ลบ
+                              <CIcon name="cil-trash" class="mr-2"/>ลบ
                             </button>
                           </td>
                         </tr>
@@ -447,18 +447,18 @@
           </CRow>
 
         </CCardBody>
-
-        <CCardFooter class="bg-white p-4 border-top d-flex justify-content-end shadow-sm" style="gap: 15px;">
-          <CButton color="danger" variant="outline" class="px-5 font-weight-bold" @click="resetForm">ล้างข้อมูล
+      </CCard>
+      <CCardFooter class="bg-white p-4 border-top d-flex justify-content-end shadow-sm" style="gap: 15px;">
+          <CButton color="danger" variant="outline" class="px-5 font-weight-bold" @click="resetForm">
+            <CIcon name="cil-trash" class="mr-2"/>ล้างข้อมูล
           </CButton>
-          <CButton color="primary" class="px-5 font-weight-bold shadow" @click="submit">
+          <CButton color="primary" class="px-5 font-weight-bold shadow" @click="saveDraft">
             <CIcon name="cil-save" class="mr-2" /> บันทึกแบบเสนอโครงการ
           </CButton>
           <CButton color="info" class="px-4 font-weight-bold" @click="exportPDF">
             <CIcon name="cil-print" class="mr-2" /> Export PDF
           </CButton>
         </CCardFooter>
-      </CCard>
     </div>
   </div>
 </template>

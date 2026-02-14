@@ -107,7 +107,7 @@
           </div>
           <div class="d-flex" style="gap: 12px;">
             <CButton color="danger" variant="outline" class="px-4 py-2 font-weight-bold" @click="resetForm">
-              <CIcon name="cil-ban" class="mr-1"/> ล้างฟอร์มทั้งหมด
+              <CIcon name="cil-trash" class="mr-1"/> ล้างฟอร์มทั้งหมด
             </CButton>
             <CButton color="primary" class="px-5 py-2 font-weight-bold shadow" @click="saveDraft">
               <CIcon name="cil-save" class="mr-1"/> บันทึกแบบร่าง
