@@ -56,10 +56,10 @@
 
                 <td class="text-center align-middle">
                   <button type="button" class="btn btn-sm btn-outline-info mr-2" @click="$emit('replace', index)">
-                    <CIcon name="cil-settings"/>
+                    <CIcon name="cil-settings" class="mr-1"/> แก้ไขไฟล์
                   </button>
                   <button type="button" class="btn btn-sm btn-outline-danger" @click="$emit('remove', index)">
-                    <CIcon name="cil-trash"/>
+                    <CIcon name="cil-trash" class="mr-1"/> ลบ
                   </button>
                 </td>
               </tr>

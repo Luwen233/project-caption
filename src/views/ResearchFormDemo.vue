@@ -56,7 +56,7 @@
 
       <footer class="bg-white p-4 border-top d-flex justify-content-end shadow-lg sticky-footer">
         <CButton color="danger" variant="outline" class="px-5 font-weight-bold mr-3" @click="resetForm">
-          <CIcon name="cil-trash" class="mr-2"/> ล้างข้อมูล
+          <CIcon name="cil-brush" class="mr-2"/> ล้างข้อมูล
         </CButton>
         <CButton color="primary" class="px-5 font-weight-bold shadow mr-3" @click="submit">
           <CIcon name="cil-save" class="mr-2" /> บันทึกแบบเสนอโครงการ

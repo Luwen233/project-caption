@@ -3,8 +3,8 @@
     <canvas ref="signatureCanvas" class="border rounded bg-white shadow-sm w-100" style="touch-action: none; height: 150px;"></canvas>
     
     <div class="mt-2 d-flex justify-content-between">
-      <CButton color="secondary" variant="outline" size="sm" @click="clear">
-        <CIcon name="cil-refresh" class="mr-1"/> ล้างฟอร์ม
+      <CButton color="danger" variant="outline" size="sm" @click="clear">
+        <CIcon name="cil-brush" class="mr-1"/> ล้างฟอร์ม
       </CButton>
       <CButton color="primary" size="sm" @click="save">
         <CIcon name="cil-check" class="mr-1"/> ยืนยันลายเซ็น
