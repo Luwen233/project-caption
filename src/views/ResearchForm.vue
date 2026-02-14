@@ -1,5 +1,14 @@
 <template>
+  
   <div class="container-fluid px-4 py-4">
+    <div class="title">
+      <h2 class="page-title1 mb-4">
+        <CIcon name="cil-paperclip"/>
+        แนบเอกสารข้อเสนอโครงการวิจัย
+      </h2>
+       <p class="mb-4">ระบบพิจารณาข้อเสนอโครงการ • ส่วนบริหารงานวิจัย</p>
+    </div>
+    <h1 class="page-title2 mb-4">แบบเสนอโครงการวิจัย</h1>
     <CRow>
       <CCol sm="12">
         <CCard class="shadow-sm">
@@ -15,7 +24,7 @@
                 <CInput label="ชื่อโครงการ (ภาษาอังกฤษ)" v-model="form.titleEN" placeholder="..." />
               </CCol>
               <CCol md="12" class="mb-4">
-                <label class="font-weight-bold">2) ประเภททุน *</label>
+                <label class="font-weight-bold">2) ประเภททุน <span class="required">*</span></label>
                 <div class="d-flex flex-wrap border rounded p-3 bg-light" style="gap: 20px;">
                   <div v-for="type in budgetTypes" :key="type.value" class="form-check form-check-inline">
                     <input class="form-check-input" type="radio" :id="type.value" :value="type.label"
@@ -52,40 +61,57 @@
                 <h6 class="font-weight-bold text-primary mb-3">1.1 หัวหน้าโครงการวิจัย</h6>
                 <CRow>
                   <CCol md="4">
-                    <CInput 
-                      label="ชื่อ-สกุล *" 
-                      v-model="form.researchers.mainResearcher.name" 
-                      placeholder="กรอกชื่อ-นามสกุล"
-                    />
+                    <CInput
+                        v-model="form.researchers.mainResearcher.name"
+                        placeholder="กรอกชื่อ-นามสกุล"
+                      >
+                        <template #label>
+                          ชื่อ-สกุล <span class="required">*</span>
+                        </template>
+                      </CInput>
+
                   </CCol>
                   <CCol md="4">
                     <CInput 
-                      label="สังกัดหน่วยงาน *" 
-                      v-model="form.researchers.mainResearcher.affiliation" 
+                     v-model="form.researchers.mainResearcher.affiliation" 
                       placeholder="เช่น วิทยาลัยการเกษตรและเทคโนโลยี"
-                    />
+                      >
+                        <template #label>
+                          สังกัดหน่วยงาน <span class="required">*</span>
+                        </template>
+                      </CInput>
                   </CCol>
                   <CCol md="4">
                     <CInput 
-                      label="เบอร์โทรศัพท์ *" 
+                      
                       v-model="form.researchers.mainResearcher.phone" 
                       placeholder="0xx-xxxxxxx"
-                    />
+                    >
+                    <template #label>
+                      เบอร์โทรศัพท์ <span class="required">*</span>
+                    </template>
+                    </CInput>
                   </CCol>
                   <CCol md="6">
                     <CInput 
-                      label="E-mail address *" 
                       v-model="form.researchers.mainResearcher.email" 
                       placeholder="name@mfu.ac.th"
                       type="email"
-                    />
+                    >
+                    <template #label>
+                      E-mail address <span class="required">*</span>
+                    </template>
+                    </CInput>
                   </CCol>
                   <CCol md="6">
                     <CInput 
-                      label="ผลเป็นเลขสังกัดหรือรับรองตละ *" 
                       v-model="form.researchers.mainResearcher.code" 
                       placeholder="เช่น 80"
-                    />
+                    >
+                    <template #label>
+                      ผลเป็นเลขสังกัดหรือรับรองตละ <span class="required">*</span>
+                    </template>
+                    </CInput>
                   </CCol>
                 </CRow>
               </div>
@@ -117,39 +143,54 @@
                   <CRow>
                     <CCol md="4">
                       <CInput 
-                        label="ชื่อ-สกุล *" 
                         v-model="researcher.name" 
                         placeholder="กรอกชื่อ"
-                      />
+                      >
+                      <template #label>
+                        ชื่อ-สกุล <span class="required">*</span>
+                      </template>
+                      </CInput>
                     </CCol>
                     <CCol md="4">
                       <CInput 
-                        label="สังกัดหน่วยงาน *" 
                         v-model="researcher.affiliation" 
                         placeholder="เช่น วิทยาลัยการเกษตรและเทคโนโลยี"
-                      />
+                      >
+                      <template #label>
+                        สังกัดหน่วยงาน <span class="required">*</span>
+                      </template>
+                      </CInput>
                     </CCol>
                     <CCol md="4">
                       <CInput 
-                        label="เบอร์โทรศัพท์ *" 
                         v-model="researcher.phone" 
                         placeholder="0xx-xxxxxxx"
-                      />
+                      >
+                      <template #label>
+                        เบอร์โทรศัพท์ <span class="required">*</span>
+                      </template>
+                      </CInput>
                     </CCol>
                     <CCol md="6">
                       <CInput 
-                        label="E-mail address *" 
                         v-model="researcher.email" 
                         placeholder="name@mfu.ac.th"
                         type="email"
-                      />
+                      >
+                      <template #label>
+                        E-mail address <span class="required">*</span>
+                      </template>
+                      </CInput>
                     </CCol>
                     <CCol md="6">
                       <CInput 
-                        label="ผลเป็นเลขสังกัดหรือรับรองตละ *" 
                         v-model="researcher.code" 
                         placeholder="เช่น 80"
-                      />
+                      >
+                      <template #label>
+                        ผลเป็นเลขสังกัดหรือรับรองตละ <span class="required">*</span>
+                      </template>
+                      </CInput>
                     </CCol>
                   </CRow>
                 </div>
@@ -187,32 +228,45 @@
                 <CRow>
                   <CCol md="4">
                     <CInput 
-                      label="ชื่อ-สกุล *" 
+
                       v-model="advisor.name" 
                       placeholder="กรอกชื่อ-นามสกุล"
-                    />
+                    >
+                      <template #label>
+                        ชื่อ-สกุล <span class="required">*</span>
+                      </template>
+                      </CInput>
                   </CCol>
                   <CCol md="4">
                     <CInput 
-                      label="สังกัดหน่วยงาน *" 
                       v-model="advisor.affiliation" 
                       placeholder="เช่น วิทยาลัยการเกษตรและเทคโนโลยี"
-                    />
+                    >
+                      <template #label>
+                        สังกัดหน่วยงาน <span class="required">*</span>
+                      </template>
+                      </CInput>
                   </CCol>
                   <CCol md="4">
-                    <CInput 
-                      label="เบอร์โทรศัพท์ *" 
+                    <CInput                       
                       v-model="advisor.phone" 
                       placeholder="0xx-xxxxxxx"
-                    />
+                    >
+                      <template #label>
+                        เบอร์โทรศัพท์ <span class="required">*</span>
+                      </template>
+                      </CInput>
                   </CCol>
                   <CCol md="12">
                     <CInput 
-                      label="E-mail address *" 
                       v-model="advisor.email" 
                       placeholder="name@mfu.ac.th"
                       type="email"
-                    />
+                    >
+                      <template #label>
+                        E-mail address <span class="required">*</span>
+                      </template>
+                      </CInput>
                   </CCol>
                 </CRow>
               </div>
@@ -279,39 +333,54 @@
                 <CRow>
                   <CCol md="4">
                     <CInput 
-                      label="ชื่อ-สกุล *" 
                       v-model="form.researchers.mainResearcher.name" 
                       placeholder="กรอกชื่อ-นามสกุล"
-                    />
+                    >
+                    <template #label>
+                      ชื่อ-สกุล <span class="required">*</span>
+                    </template>
+                    </CInput>
                   </CCol>
                   <CCol md="4">
                     <CInput 
-                      label="สังกัดหน่วยงาน *" 
                       v-model="form.researchers.mainResearcher.affiliation" 
                       placeholder="เช่น วิทยาลัยการเกษตรและเทคโนโลยี"
-                    />
+                    >
+                    <template #label>
+                      สังกัดหน่วยงาน <span class="required">*</span>
+                    </template>
+                    </CInput>
                   </CCol>
                   <CCol md="4">
                     <CInput 
-                      label="เบอร์โทรศัพท์ *" 
                       v-model="form.researchers.mainResearcher.phone" 
                       placeholder="0xx-xxxxxxx"
-                    />
+                    >
+                    <template #label>
+                      เบอร์โทรศัพท์ <span class="required">*</span>
+                    </template>
+                    </CInput>
                   </CCol>
                   <CCol md="6">
                     <CInput 
-                      label="E-mail address *" 
                       v-model="form.researchers.mainResearcher.email" 
                       placeholder="name@mfu.ac.th"
                       type="email"
-                    />
+                    >
+                    <template #label>
+                      E-mail address <span class="required">*</span>
+                    </template>
+                    </CInput>
                   </CCol>
                   <CCol md="6">
                     <CInput 
-                      label="ผลเป็นเลขสังกัดหรือรับรองตละ *" 
                       v-model="form.researchers.mainResearcher.code" 
                       placeholder="เช่น 80"
-                    />
+                    >
+                    <template #label>
+                      ผลเป็นเลขสังกัดหรือรับรองตละ <span class="required">*</span>
+                    </template>
+                    </CInput>
                   </CCol>
                 </CRow>
               </div>
@@ -343,39 +412,54 @@
                   <CRow>
                     <CCol md="4">
                       <CInput 
-                        label="ชื่อ-สกุล *" 
                         v-model="researcher.name" 
                         placeholder="กรอกชื่อ"
-                      />
+                      >
+                      <template #label>
+                        ชื่อ-สกุล <span class="required">*</span>
+                      </template>
+                      </CInput>
                     </CCol>
                     <CCol md="4">
                       <CInput 
-                        label="สังกัดหน่วยงาน *" 
                         v-model="researcher.affiliation" 
                         placeholder="เช่น วิทยาลัยการเกษตรและเทคโนโลยี"
-                      />
+                      >
+                      <template #label>
+                        สังกัดหน่วยงาน <span class="required">*</span>
+                      </template>
+                      </CInput>
                     </CCol>
                     <CCol md="4">
                       <CInput 
-                        label="เบอร์โทรศัพท์ *" 
                         v-model="researcher.phone" 
                         placeholder="0xx-xxxxxxx"
-                      />
+                      >
+                      <template #label>
+                        เบอร์โทรศัพท์ <span class="required">*</span>
+                      </template>
+                      </CInput>
                     </CCol>
                     <CCol md="6">
                       <CInput 
-                        label="E-mail address *" 
                         v-model="researcher.email" 
                         placeholder="name@mfu.ac.th"
                         type="email"
-                      />
+                      >
+                      <template #label>
+                        E-mail address <span class="required">*</span>
+                      </template>
+                      </CInput>
                     </CCol>
                     <CCol md="6">
                       <CInput 
-                        label="ผลเป็นเลขสังกัดหรือรับรองตละ *" 
                         v-model="researcher.code" 
                         placeholder="เช่น 80"
-                      />
+                      >
+                      <template #label>
+                        ผลเป็นเลขสังกัดหรือรับรองตละ <span class="required">*</span>
+                      </template>
+                      </CInput>
                     </CCol>
                   </CRow>
                 </div>
@@ -413,32 +497,44 @@
                 <CRow>
                   <CCol md="4">
                     <CInput 
-                      label="ชื่อ-สกุล *" 
                       v-model="advisor.name" 
                       placeholder="กรอกชื่อ-นามสกุล"
-                    />
+                    >
+                      <template #label>
+                        ชื่อ-สกุล <span class="required">*</span>
+                      </template>
+                      </CInput>
                   </CCol>
                   <CCol md="4">
                     <CInput 
-                      label="สังกัดหน่วยงาน *" 
                       v-model="advisor.affiliation" 
                       placeholder="เช่น วิทยาลัยการเกษตรและเทคโนโลยี"
-                    />
+                    >
+                      <template #label>
+                        สังกัดหน่วยงาน <span class="required">*</span>
+                      </template>
+                      </CInput>
                   </CCol>
                   <CCol md="4">
                     <CInput 
-                      label="เบอร์โทรศัพท์ *" 
                       v-model="advisor.phone" 
                       placeholder="0xx-xxxxxxx"
-                    />
+                    >
+                      <template #label>
+                        เบอร์โทรศัพท์ <span class="required">*</span>
+                      </template>
+                      </CInput>
                   </CCol>
                   <CCol md="12">
                     <CInput 
-                      label="E-mail address *" 
                       v-model="advisor.email" 
                       placeholder="name@mfu.ac.th"
                       type="email"
-                    />
+                    >
+                      <template #label>
+                        E-mail address <span class="required">*</span>
+                      </template>
+                      </CInput>
                   </CCol>
                 </CRow>
               </div>
@@ -483,7 +579,7 @@
 
             <CRow class="mb-4">
               <CCol md="12">
-                <label class="font-weight-bold">2) ประเภททุน *</label>
+                <label class="font-weight-bold">2) ประเภททุน <span class="required">*</span></label>
                 <div class="d-flex flex-wrap border rounded p-3 bg-light" style="gap: 25px;">
                   <div v-for="type in budgetTypes" :key="type.value" class="custom-control custom-radio">
                     <input type="radio" :id="'radio-' + type.value" :value="type.label" v-model="form.budgetType"
@@ -761,13 +857,33 @@ export default {
 
 <style scoped>
 /* ปรับแต่งความสวยงามของ Editor ให้เข้ากับ CoreUI */
+.container-fluid{
+  min-height: 100vh;
+  background: linear-gradient(
+    to bottom ,
+    #2C2C2C,
+    #D8E983
+  );
+}
+.title{
+  font-size: 1rem;
+  /* font-weight: bold; */
+  margin-bottom: 10px;
+  color: #4285F4;
+}
+.page-title2 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #ffffff;
+}
 .quill-editor {
-  background-color: white;
+  background-color: #ffffff;
 }
 
 .ql-toolbar.ql-snow {
   border: 1px solid #ebedef;
-  background-color: #f8f9fa;
+  background-color: #F2F1ED;
   border-top-left-radius: 4px;
   border-top-right-radius: 4px;
 }
@@ -777,4 +893,10 @@ export default {
   border-bottom-left-radius: 4px;
   border-bottom-right-radius: 4px;
 }
+.required {
+  color: #dc2626;   /* แดงสุภาพ */
+  font-weight: 700;
+}
+
+
 </style>
