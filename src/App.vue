@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import ResearchForm from './views/ResearchFormDemo.vue'
+import ResearchForm from './views/ResearchForm.vue'
 // import Form from './views/forms/Forms.vue'
 
 export default {
