@@ -14,10 +14,15 @@
         </h6>
         <CRow>
           <CCol lg="4" md="6">
-            <CInput label="ชื่อ-นามสกุล *" :value="form.researchers.mainResearcher.name" @input="updateMain('name', $event)" />
+            <CInput  :value="form.researchers.mainResearcher.name" @input="updateMain('name', $event)" 
+            >
+              <template #label>
+                ชื่อ-สกุล <span class="required">*</span>
+              </template>
+            </CInput>
           </CCol>
           <CCol lg="4" md="6">
-            <CInput label="สังกัดหน่วยงาน *" :value="form.researchers.mainResearcher.affiliation" @input="updateMain('affiliation', $event)" />
+            <CInput  :value="form.researchers.mainResearcher.affiliation" @input="updateMain('affiliation', $event)" />
           </CCol>
           <CCol lg="4" md="6">
             <CInput label="เบอร์โทรศัพท์ *" :value="form.researchers.mainResearcher.phone" @input="updateMain('phone', $event)" />
