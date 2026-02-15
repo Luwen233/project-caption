@@ -23,7 +23,7 @@
             <div 
               v-for="m in duration" 
               :key="'h-' + m" 
-              class="month-cell header bg-primary text-white font-weight-bold text-center small border-right border-white-50"
+              class="month-cell header bg-primary text-white font-weight-bold text-center border-right border-white-50"
             >
               ด.{{ m }}
             </div>

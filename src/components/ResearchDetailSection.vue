@@ -10,7 +10,7 @@
                 :class="['mb-4 pb-4', i < textFields.length - 1 ? 'border-bottom' : '']">
 
                 <h5 class="font-weight-bold text-dark mb-3">
-                    {{ field.label }}
+                    {{ field.label }} *
                 </h5>
 
                 <div class="border rounded shadow-sm overflow-hidden">
