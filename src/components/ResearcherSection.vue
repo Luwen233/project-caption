@@ -14,24 +14,39 @@
         </h6>
         <CRow>
           <CCol lg="4" md="6">
-            <CInput  :value="form.researchers.mainResearcher.name" @input="updateMain('name', $event)" 
-            >
+            <CInput  :value="form.researchers.mainResearcher.name" @input="updateMain('name', $event)">
               <template #label>
                 ชื่อ-สกุล <span class="required">*</span>
               </template>
             </CInput>
           </CCol>
           <CCol lg="4" md="6">
-            <CInput  :value="form.researchers.mainResearcher.affiliation" @input="updateMain('affiliation', $event)" />
+            <CInput  :value="form.researchers.mainResearcher.affiliation" @input="updateMain('affiliation', $event)" >
+              <template #label>
+                สังกัดหน่วยงาน <span class="required">*</span>
+              </template>
+            </CInput>
           </CCol>
           <CCol lg="4" md="6">
-            <CInput label="เบอร์โทรศัพท์ *" :value="form.researchers.mainResearcher.phone" @input="updateMain('phone', $event)" />
+            <CInput :value="form.researchers.mainResearcher.phone" @input="updateMain('phone', $event)">
+              <template #label>
+                เบอร์โทรศัพท์ <span class="required">*</span>
+              </template>
+            </CInput>
           </CCol>
           <CCol lg="6" md="6">
-            <CInput label="E-mail address *" :value="form.researchers.mainResearcher.email" type="email" @input="updateMain('email', $event)" />
+            <CInput :value="form.researchers.mainResearcher.email" type="email" @input="updateMain('email', $event)">
+              <template #label>
+                E-mail <span class="required">*</span>
+              </template>
+            </CInput>
           </CCol>
           <CCol lg="6" md="12">
-            <CInput label="สัดส่วนการวิจัย (%) *" :value="form.researchers.mainResearcher.code" type="number" @input="updateMain('code', $event)" />
+            <CInput :value="form.researchers.mainResearcher.code" type="number" @input="updateMain('code', $event)">
+              <template #label>
+                สัดส่วนการวิจัย (%) <span class="required">*</span>
+              </template>
+            </CInput>
           </CCol>
         </CRow>
       </div>
@@ -48,26 +63,46 @@
         <div v-for="(r, idx) in form.researchers.coResearchers" :key="'co-' + idx"
           class="border rounded p-3 mb-3 bg-light position-relative w-100">
           <div class="d-flex justify-content-between mb-3">
-            <span class="badge badge-success px-3">คนที่ {{ idx + 1 }}</span>
+            <span class="badge badge-success d-flex align-items-center justify-content-center px-3">คนที่ {{ idx + 1 }}</span>
             <CButton color="danger" size="sm" variant="ghost" @click="removeCoResearcher(idx)">
               <CIcon name="cil-trash" />
             </CButton>
           </div>
           <CRow>
             <CCol lg="4" md="6">
-              <CInput label="ชื่อ-นามสกุล *" :value="r.name" @input="updateCo(idx, 'name', $event)" />
+              <CInput :value="r.name" @input="updateCo(idx, 'name', $event)">
+                <template #label>
+                  ชื่อ-สกุล <span class="required">*</span>
+                </template>
+              </CInput>
             </CCol>
             <CCol lg="4" md="6">
-              <CInput label="สังกัดหน่วยงาน *" :value="r.affiliation" @input="updateCo(idx, 'affiliation', $event)" />
+              <CInput :value="r.affiliation" @input="updateCo(idx, 'affiliation', $event)">
+                <template #label>
+                  สังกัดหน่วยงาน <span class="required">*</span>
+                </template>
+              </CInput>
             </CCol>
             <CCol lg="4" md="6">
-              <CInput label="เบอร์โทรศัพท์ *" :value="r.phone" @input="updateCo(idx, 'phone', $event)" />
+              <CInput :value="r.phone" @input="updateCo(idx, 'phone', $event)">
+                <template #label>
+                  เบอร์โทรศัพท์ <span class="required">*</span>
+                </template>
+              </CInput>
             </CCol>
             <CCol lg="6" md="6">
-              <CInput label="E-mail *" :value="r.email" @input="updateCo(idx, 'email', $event)" />
+              <CInput :value="r.email" @input="updateCo(idx, 'email', $event)">
+                <template #label>
+                  E-mail <span class="required">*</span>
+                </template>
+              </CInput>
             </CCol>
             <CCol lg="6" md="12">
-              <CInput label="สัดส่วนการวิจัย (%) *" :value="r.code" type="number" @input="updateCo(idx, 'code', $event)" />
+              <CInput :value="r.code" type="number" @input="updateCo(idx, 'code', $event)">
+                <template #label>
+                  สัดส่วนการวิจัย (%) <span class="required">*</span>
+                </template>
+              </CInput>
             </CCol>
           </CRow>
         </div>
@@ -92,16 +127,32 @@
         </div>
         <CRow>
           <CCol lg="4" md="6">
-            <CInput label="ชื่อ-นามสกุล *" :value="adv.name" @input="updateAdv(idx, 'name', $event)" />
+            <CInput :value="adv.name" @input="updateAdv(idx, 'name', $event)">
+              <template #label>
+                ชื่อ-สกุล <span class="required">*</span>
+              </template>
+            </CInput>
           </CCol>
           <CCol lg="4" md="6">
-            <CInput label="สังกัดหน่วยงาน *" :value="adv.affiliation" @input="updateAdv(idx, 'affiliation', $event)" />
+            <CInput :value="adv.affiliation" @input="updateAdv(idx, 'affiliation', $event)">
+              <template #label>
+                สังกัดหน่วยงาน <span class="required">*</span>
+              </template>
+            </CInput>
           </CCol>
           <CCol lg="4" md="6">
-            <CInput label="เบอร์โทรศัพท์ *" :value="adv.phone" @input="updateAdv(idx, 'phone', $event)" />
+            <CInput :value="adv.phone" @input="updateAdv(idx, 'phone', $event)">
+              <template #label>
+                เบอร์โทรศัพท์ <span class="required">*</span>
+              </template>
+            </CInput>
           </CCol>
           <CCol lg="12">
-            <CInput label="E-mail address *" :value="adv.email" @input="updateAdv(idx, 'email', $event)" />
+            <CInput :value="adv.email" @input="updateAdv(idx, 'email', $event)">
+              <template #label>
+                E-mail <span class="required">*</span>
+              </template>
+            </CInput>
           </CCol>
         </CRow>
       </div>
@@ -142,3 +193,8 @@ export default {
   }
 }
 </script>
+<style>
+.required {
+  color: red;
+}
+</style>

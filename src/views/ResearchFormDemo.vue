@@ -1,7 +1,14 @@
 <template>
-  <div class="container-fluid px-0 bg-light min-vh-100">
+  <div class="container-fluid px-0 page-bg min-vh-100">
     <div class="w-100 p-4">
-      
+      <div class="d-flex align-items-center mb-4">
+        <h3 class="font-weight-bold text-primary mb-0">
+          <CIcon name="cil-paperclip" class="mr-2 text-primary" size="lg" />
+          แนบเอกสารข้อเสนอโครงการวิจัย</h3 >
+      </div>
+      <div class="d-flex align-items-center mb-4">
+        <h1 class="font-weight-bold text-gray mb-0">แบบเสนอโครงการวิจัย (RS1)</h1>
+      </div>
       <GeneralInfoSection 
         :form.sync="form" 
         :budget-types="budgetTypes" 
@@ -186,10 +193,18 @@ export default {
 </script>
 
 <style scoped>
+.page-bg{
+  background: linear-gradient(
+    to bottom,
+    #D6F4ED,
+    #473472
+  );
+}
 .sticky-footer {
   position: sticky;
   bottom: 0;
   z-index: 1000;
   box-shadow: 0 -5px 15px rgba(0,0,0,0.05);
 }
+
 </style>

@@ -72,7 +72,7 @@
                         :options="editorOption" />
                 </div>
 
-                <h5 class="font-weight-bold text-dark mb-3">16) ระดับการถ่ายทอดสู่สังคม *</h5>
+                <h5 class="font-weight-bold text-dark mb-3">16) ระดับการถ่ายทอดสู่สังคม <span class="required">*</span></h5>
                 <div class="bg-light p-4 rounded border mb-5 shadow-sm w-100 border-left-primary">
                     <div class="ml-3">
                         <div v-for="(opt, i) in transferOptions" :key="'trans-' + i"
