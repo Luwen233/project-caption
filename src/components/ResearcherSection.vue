@@ -2,11 +2,11 @@
   <CCard class="shadow-sm w-100 mb-4 border-0">
     <CCardHeader class="bg-primary text-white py-3">
       <h5 class="m-0 font-weight-bold">
-        <CIcon name="cil-people" class="mr-2" /> ส่วน ก) : สาระสำคัญของข้อเสนอโครงการวิจัย — คณะผู้วิจัย
+        <CIcon name="cil-people" class="mr-2" /> ส่วน ก. : สาระสำคัญของข้อเสนอโครงการวิจัย — คณะผู้วิจัย
       </h5>
     </CCardHeader>
     <CCardBody class="p-4">
-      <h5 class="font-weight-bold mb-4 text-dark">1) คณะผู้วิจัย</h5>
+      <h5 class="font-weight-bold mb-4 text-dark">1. คณะผู้วิจัย</h5>
 
       <div class="border rounded p-4 mb-4 bg-light shadow-sm w-100">
         <h6 class="font-weight-bold text-primary mb-3 border-bottom pb-2">

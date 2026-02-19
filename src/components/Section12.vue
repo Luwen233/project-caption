@@ -18,7 +18,9 @@
       <div class="gantt-table">
         
         <div class="gantt-row header-row sticky-top">
-          <div class="cell fixed-left sticky-col bg-primary text-white font-weight-bold text-center">กิจกรรม</div>
+          <div class="cell fixed-left sticky-col bg-primary text-white font-weight-bold text-center d-flex align-items-center justify-content-center">
+            กิจกรรม
+          </div>
           <div class="gantt-months-area d-flex">
             <div 
               v-for="m in duration" 
@@ -28,7 +30,9 @@
               ด.{{ m }}
             </div>
           </div>
-          <div class="cell fixed-right sticky-col bg-primary text-white font-weight-bold text-center">ผู้รับผิดชอบ</div>
+            <div class="cell fixed-left sticky-col bg-primary text-white font-weight-bold text-center d-flex align-items-center justify-content-center">
+            ผู้รับผิดชอบ
+          </div>
         </div>
 
         <div v-for="(act, index) in activities" :key="'row-' + index" class="gantt-row content-row">

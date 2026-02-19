@@ -2,7 +2,7 @@
     <CCard class="shadow-sm w-100 mb-4 border-0">
         <CCardHeader class="bg-primary text-white py-3">
             <h5 class="m-0 font-weight-bold">
-                <CIcon name="cil-library" class="mr-2" /> 5-11) รายละเอียดเนื้อหาโครงการวิจัย
+                <CIcon name="cil-library" class="mr-2" /> 5 - 11. รายละเอียดเนื้อหาโครงการวิจัย
             </h5>
         </CCardHeader>
         <CCardBody class="p-4 bg-white">

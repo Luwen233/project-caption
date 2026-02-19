@@ -9,11 +9,6 @@
       <div class="d-flex align-items-center mb-4">
         <h1 class="font-weight-bold text-gray mb-0">แบบเสนอโครงการวิจัย (RS1)</h1>
       </div>
-      <GeneralInfoSection 
-        :form.sync="form" 
-        :budget-types="budgetTypes" 
-        :research-type-options="researchTypeOptions" 
-      />
 
       <ResearchersSection 
         :form.sync="form" 
@@ -21,6 +16,12 @@
         @remove-co="removeCoResearcher"
         @add-adv="addAdvisor"
         @remove-adv="removeAdvisor"
+      />
+
+            <GeneralInfoSection 
+        :form.sync="form" 
+        :budget-types="budgetTypes" 
+        :research-type-options="researchTypeOptions" 
       />
 
       <ResearchDetailsSection 
@@ -32,7 +33,7 @@
       <CCard class="shadow-sm w-100 mb-4 border-0">
         <CCardHeader class="bg-primary text-white py-3">
           <h5 class="m-0 font-weight-bold">
-            <CIcon name="cil-calendar" class="mr-2" /> 12) แผนการดำเนินงาน
+            <CIcon name="cil-calendar" class="mr-2" /> 12. แผนการดำเนินงาน
           </h5>
         </CCardHeader>
         <CCardBody class="p-4 bg-white">
@@ -127,13 +128,13 @@ export default {
         { value: 'Social', label: 'ด้านสังคมศาสตร์และมนุญศาสตร์' }
       ],
       textFields: [
-        { label: "5) คำสำคัญ (Keywords)", model: "keywords" },
-        { label: "6) ความสำคัญของปัญหาและแนวคิด", model: "importance" },
-        { label: "7) วัตถุประสงค์", model: "objective" },
-        { label: "8) ทบทวนวรรณกรรม", model: "literature" },
-        { label: "9) เอกสารอ้างอิง", model: "reference" },
-        { label: "10) วิธีดำเนินการวิจัย", model: "methodology" },
-        { label: "11) ขอบเขตการวิจัย", model: "scope" }
+        { label: "5. คำสำคัญ (Keywords)", model: "keywords" },
+        { label: "6. ความสำคัญของปัญหาและแนวคิด", model: "importance" },
+        { label: "7. วัตถุประสงค์", model: "objective" },
+        { label: "8. ทบทวนวรรณกรรม", model: "literature" },
+        { label: "9. เอกสารอ้างอิง", model: "reference" },
+        { label: "10. วิธีดำเนินการวิจัย", model: "methodology" },
+        { label: "11. ขอบเขตการวิจัย", model: "scope" }
       ],
       outcomes: {
         newResearcher: ["นำเสนอในการประชุมวิชาการระดับนานาชาติ (Proceedings)", "ตีพิมพ์ในวารสารฐานข้อมูล ก.พ.อ.", "ตีพิมพ์วารสาร TCI กลุ่ม 1 หรือ 2", "อนุสิทธิบัตร/สิทธิบัตร"],

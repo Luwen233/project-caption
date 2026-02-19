@@ -2,7 +2,7 @@
   <CCard class="shadow-sm w-100 mb-4 border-0">
     <CCardHeader class="bg-primary text-white py-3">
       <h5 class="m-0 font-weight-bold">
-        <CIcon name="cil-check-circle" class="mr-2" /> 18) มาตรฐานการวิจัย <span class="required">*</span>
+        <CIcon name="cil-check-circle" class="mr-2" /> 18. มาตรฐานการวิจัย <span class="required">*</span>
       </h5>
     </CCardHeader>
     

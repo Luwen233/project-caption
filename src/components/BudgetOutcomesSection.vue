@@ -2,19 +2,19 @@
     <CCard class="shadow-sm w-100 mb-4 border-0">
         <CCardHeader class="bg-primary text-white py-3">
             <h5 class="m-0 font-weight-bold">
-                <CIcon name="cil-money" class="mr-2" /> 13-17) งบประมาณและผลลัพธ์
+                <CIcon name="cil-money" class="mr-2" /> 13-17. งบประมาณและผลลัพธ์
             </h5>
         </CCardHeader>
         <CCardBody class="p-4 bg-white">
             <div class="mb-5">
-                <h5 class="font-weight-bold text-dark">13) ผลงานตามระยะเวลาการรายงาน</h5>
+                <h5 class="font-weight-bold text-dark">13. ผลงานตามระยะเวลาการรายงาน</h5>
 
                 <div class="border rounded shadow-sm overflow-hidden mb-4">
                     <quill-editor :value="form['progressReport']" @input="onEditorInput('progressReport', $event)"
                         :options="editorOption" />
                 </div>
 
-                <h5 class="font-weight-bold mb-4 text-dark border-bottom pb-2">14) ผลลัพธ์ที่คาดว่าจะได้รับ
+                <h5 class="font-weight-bold mb-4 text-dark border-bottom pb-2">14. ผลลัพธ์ที่คาดว่าจะได้รับ
                     (สัมพันธ์กับประเภททุน)</h5>
                 <div v-if="form.budgetType" class="p-4 border rounded bg-light shadow-sm mb-4 border-left-primary">
 
@@ -66,13 +66,13 @@
             </div>
 
             <div class="mb-5">
-                <h5 class="font-weight-bold text-dark">15) การบูรณาการงานวิจัย</h5>
+                <h5 class="font-weight-bold text-dark">15. การบูรณาการงานวิจัย</h5>
                 <div class="border rounded shadow-sm overflow-hidden mb-4">
                     <quill-editor :value="form['progressReport']" @input="onEditorInput('integration', $event)"
                         :options="editorOption" />
                 </div>
 
-                <h5 class="font-weight-bold text-dark mb-3">16) ระดับการถ่ายทอดสู่สังคม <span class="required">*</span></h5>
+                <h5 class="font-weight-bold text-dark mb-3">16. ระดับการถ่ายทอดสู่สังคม <span class="required">*</span></h5>
                 <div class="bg-light p-4 rounded border mb-5 shadow-sm w-100 border-left-primary">
                     <div class="ml-3">
                         <div v-for="(opt, i) in transferOptions" :key="'trans-' + i"
@@ -86,7 +86,7 @@
                     </div>
                 </div>
 
-                <h5 class="font-weight-bold mb-3 text-dark">17) กรอกรายละเอียดงบประมาณ (พ.ศ. 2569)</h5>
+                <h5 class="font-weight-bold mb-3 text-dark">17. กรอกรายละเอียดงบประมาณ (พ.ศ. 2569)</h5>
                 <div class="border rounded bg-white shadow-sm overflow-hidden mb-4">
                     <BudgetSection :value="form.budgets" @input="updateField('budgets', $event)" />
                 </div>
